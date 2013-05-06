@@ -127,7 +127,24 @@ public class PlayChess extends Activity {
 				});
                  
 //            	 ImageButton im = new ImageButton(this);
-                 im.setImageResource(R.drawable.ic_launcher);
+                 //black back row
+                 if (r==7){
+                     im.setImageResource(R.drawable.ic_launcher);
+
+                 }
+                 //black pawns
+                 if (r==6){
+                	 im.setImageResource()
+                 }
+                 //white pawns
+                 if (r==1){
+                	 
+                 }
+                 //white back row
+                 if (r==0){
+                     im.setImageResource(R.drawable.ic_launcher);
+
+                 }
 //                 im.setPadding(0, 0, 0, 0); //padding in each image if needed
         		 im.setAdjustViewBounds(true);
         		 
