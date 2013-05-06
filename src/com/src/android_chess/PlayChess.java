@@ -102,9 +102,10 @@ public class PlayChess extends Activity {
 									Toast.makeText(getBaseContext(), "Moving to location " + dest, Toast.LENGTH_SHORT).show();
 									squares[dest.getRank()][dest.getFile()].removePiece();
 									squares[dest.getRank()][dest.getFile()].addPiece(squares[x][y].getPiece());
+									squares[src.getRank()][src.getFile()].removePiece();
 									switchImage(squares[dest.getRank()][dest.getFile()]);
-									squares[x][y].removePiece();
-									switchImage(squares[x][y]);
+									switchImage(squares[src.getRank()][src.getFile()]);
+//									renderBoard();
 								}
 								catch(IllegalMoveException e) {
 									Toast.makeText(getBaseContext(), "That move is not allowed.", Toast.LENGTH_SHORT).show();
@@ -252,10 +253,11 @@ public class PlayChess extends Activity {
 	
 	private void switchImage(Square im){
 		Location loc = new Location(im.getLocation());
+		Globals.getInstance().toaster(getApplicationContext(), "location:" + loc);
 		if(game.getGrid().isOccupied(loc)) {
 			Piece p = game.getGrid().get(loc);
 			String type = p.getAlgebraicName();
-			Globals.getInstance().toaster(getApplicationContext(), type);
+			Globals.getInstance().toaster(getApplicationContext(), "type: " + type);
 			if(type.equals("")) {
 				im.setImageResource(p.isWhite() ? R.drawable.whitepawn : R.drawable.blackpawn);
 			}
@@ -292,22 +294,25 @@ public class PlayChess extends Activity {
     		im.setBackgroundColor(Color.GRAY);
     	}
 	}
-	/*
+//	/*
 	private void renderBoard() {
 //		linearLayout = (LinearLayout) this.findViewById(R.id.chessboard);
+		linearLayout.removeView(table);
 		linearLayout.removeAllViews();
-//		table = new TableLayout(this);
-		table.removeAllViews();
-		linearLayout.addView(table);
-		table.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-		table.setStretchAllColumns(true);
-		table.setOrientation(LinearLayout.VERTICAL);
+		linearLayout.invalidate();
+		linearLayout.refreshDrawableState();
+		TableLayout newTable = new TableLayout(this);
+		newTable.removeAllViews();
+		linearLayout.addView(newTable);
+		newTable.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		newTable.setStretchAllColumns(true);
+		newTable.setOrientation(LinearLayout.VERTICAL);
 		
 		for(int rank = 7; rank >= 0; rank--) {
 			tr.removeAllViews();
-			tr = new TableRow(this);
-			table.addView(tr);
-			tr.setLayoutParams(new TableLayout.LayoutParams(
+			TableRow newTR = new TableRow(this);
+			newTable.addView(newTR);
+			newTR.setLayoutParams(new TableLayout.LayoutParams(
 					LayoutParams.WRAP_CONTENT,
 					LayoutParams.WRAP_CONTENT));
 			
@@ -356,16 +361,16 @@ public class PlayChess extends Activity {
                         TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT));
                 
-                tr.removeAllViews();
-                tr.invalidate();
-                tr.refreshDrawableState();
-                tr.addView(im);
+//                newTR.removeAllViews();
+//                newTR.invalidate();
+//                newTR.refreshDrawableState();
+                newTR.addView(im);
 				//** end here ***
 			}
 		}
 	}
 	
-	*/
+//	*/
 	
 	/**
 	 * Offers a draw.
