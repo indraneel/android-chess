@@ -1,34 +1,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
-    
-<!--     <item
+     <Button
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_weight="1"
         android:id="@+id/ai_button"
         android:orderInCategory="100"
-        android:showAsAction="never"
         android:title="@string/ai"
         android:onClick="ai"/>
-    <item
+    <Button
         android:id="@+id/undo_button"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/undo"
         android:onClick="undo"/>
-    <item
+    <Button
         android:id="@+id/draw_button"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/draw"
         android:onClick="draw" />
-    <item
+    <Button
         android:id="@+id/resign_button"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/resign"
         android:onClick="resign" />
- -->
+ 
 </menu>

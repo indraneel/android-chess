@@ -100,12 +100,12 @@ public class PlayChess extends Activity {
 								try {
 									game.move(src, dest);
 									Toast.makeText(getBaseContext(), "Moving to location " + dest, Toast.LENGTH_SHORT).show();
-									squares[dest.getRank()][dest.getFile()].removePiece();
-									squares[dest.getRank()][dest.getFile()].addPiece(squares[x][y].getPiece());
-									squares[src.getRank()][src.getFile()].removePiece();
-									switchImage(squares[dest.getRank()][dest.getFile()]);
-									switchImage(squares[src.getRank()][src.getFile()]);
-//									renderBoard();
+//									squares[dest.getRank()][dest.getFile()].removePiece();
+//									squares[dest.getRank()][dest.getFile()].addPiece(squares[x][y].getPiece());
+//									squares[src.getRank()][src.getFile()].removePiece();
+//									switchImage(squares[dest.getRank()][dest.getFile()]);
+//									switchImage(squares[src.getRank()][src.getFile()]);
+									renderBoard();
 								}
 								catch(IllegalMoveException e) {
 									Toast.makeText(getBaseContext(), "That move is not allowed.", Toast.LENGTH_SHORT).show();
@@ -294,7 +294,7 @@ public class PlayChess extends Activity {
     		im.setBackgroundColor(Color.GRAY);
     	}
 	}
-//	/*
+	/*
 	private void renderBoard() {
 //		linearLayout = (LinearLayout) this.findViewById(R.id.chessboard);
 		linearLayout.removeView(table);
@@ -315,56 +315,60 @@ public class PlayChess extends Activity {
 			newTR.setLayoutParams(new TableLayout.LayoutParams(
 					LayoutParams.WRAP_CONTENT,
 					LayoutParams.WRAP_CONTENT));
+			Square[][] temp = new Square[8][8];
 			
 			for(int file = 0; file < 8; file++) {
 				Location loc = new Location(rank, file);
-				Square im = squares[rank][file];
+				temp[rank][file] = squares[rank][file];
 				if(game.getGrid().isOccupied(loc)) {
 					Piece p = game.getGrid().get(loc);
 					String type = p.getAlgebraicName();
 					if(type.equals("")) {
-						im.setImageResource(p.isWhite() ? R.drawable.whitepawn : R.drawable.blackpawn);
+						temp[rank][file].setImageResource(p.isWhite() ? R.drawable.whitepawn : R.drawable.blackpawn);
 					}
 					else if(type.equals("N")) {
-						im.setImageResource(p.isWhite() ? R.drawable.whiteknight : R.drawable.blackknight);
+						temp[rank][file].setImageResource(p.isWhite() ? R.drawable.whiteknight : R.drawable.blackknight);
 					}
 					else if(type.equals("B")) {
-						im.setImageResource(p.isWhite() ? R.drawable.whitebishop : R.drawable.blackbishop);
+						temp[rank][file].setImageResource(p.isWhite() ? R.drawable.whitebishop : R.drawable.blackbishop);
 					}
 					else if(type.equals("R")) {
-						im.setImageResource(p.isWhite() ? R.drawable.whiterook : R.drawable.blackrook);
+						temp[rank][file].setImageResource(p.isWhite() ? R.drawable.whiterook : R.drawable.blackrook);
 					}
 					else if(type.equals("Q")) {
-						im.setImageResource(p.isWhite() ? R.drawable.whitequeen : R.drawable.blackqueen);
+						temp[rank][file].setImageResource(p.isWhite() ? R.drawable.whitequeen : R.drawable.blackqueen);
 					}
 					else if(type.equals("K")) {
-						im.setImageResource(p.isWhite() ? R.drawable.whiteking : R.drawable.blackking);
+						temp[rank][file].setImageResource(p.isWhite() ? R.drawable.whiteking : R.drawable.blackking);
 					}
 				}
 				else {
-					im.setImageResource(R.drawable.transparent);
+					temp[rank][file].setImageResource(R.drawable.transparent);
 				}
 				
-				im.setAdjustViewBounds(true);
-				im.setMinimumHeight(displayHeight/10);
-       		 	im.setMinimumWidth(20);
-       		 	im.setMaxHeight(displayHeight / 10);
-       		 	im.setMaxWidth(20);
+				temp[rank][file].setAdjustViewBounds(true);
+				temp[rank][file].setMinimumHeight(displayHeight/10);
+       		 	temp[rank][file].setMinimumWidth(20);
+       		 	temp[rank][file].setMaxHeight(displayHeight / 10);
+       		 	temp[rank][file].setMaxWidth(20);
        		 	if (squares[rank][file].isWhite()){
-       		 		im.setBackgroundColor(Color.WHITE);
+       		 		temp[rank][file].setBackgroundColor(Color.WHITE);
        		 	}
        		 	else {
-       		 		im.setBackgroundColor(Color.GRAY);
+       		 		temp[rank][file].setBackgroundColor(Color.GRAY);
        		 	}
            	 
-                im.setLayoutParams(new TableRow.LayoutParams(
+                temp[rank][file].setLayoutParams(new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT));
                 
 //                newTR.removeAllViews();
 //                newTR.invalidate();
 //                newTR.refreshDrawableState();
-                newTR.addView(im);
+                View parent = ((View) temp[rank][file].getParent());
+                
+                newTR.removeView(temp[rank][file]);
+                newTR.addView(temp[rank][file]);
 				//** end here ***
 			}
 		}
