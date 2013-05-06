@@ -46,5 +46,10 @@ public class Start extends Activity {
 		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();
 	}
+	
+	public void playback(View view){
+		Intent intent = new Intent(this, SelectGame.class);
+		startActivity(intent);
+	}
 
 }
