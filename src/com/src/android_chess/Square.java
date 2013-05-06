@@ -55,5 +55,6 @@ public class Square extends ImageView {
 //		Globals.getInstance().toggleSelected();
 	}
 	
-
+			
 }
+

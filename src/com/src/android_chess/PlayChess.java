@@ -40,6 +40,8 @@ public class PlayChess extends Activity {
 	     table.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 	     table.setStretchAllColumns(true);
 	     table.setOrientation(LinearLayout.VERTICAL);
+	     setupBoard();
+	     
 	     //this is 1-8
          for (int r=7; r>=0; r--){
              TableRow tr = new TableRow(this);
@@ -47,12 +49,52 @@ public class PlayChess extends Activity {
              tr.setLayoutParams(new TableLayout.LayoutParams(
                      LayoutParams.WRAP_CONTENT,
                      LayoutParams.WRAP_CONTENT));
-             setupBoard();
              
              //this is a-h
              for (int c=0; c<8; c++){
 //            	 TextView im = new TextView(this);
-                 ImageView im = new ImageView (this);
+            	 final int x = r, y = c;
+            	 
+                 ImageView im = squares[r][c];
+                 im.setOnClickListener(new View.OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+						System.out.println("running onclick!");
+						if (Globals.getInstance().isSelectedPiece()){
+							System.out.println("running onclick - first if!");
+							//unselect this piece
+							if (squares[x][y].isSelected()){
+								squares[x][y].toggleSelected();
+								Globals.getInstance().toggleSelected();
+								squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.BLACK);
+							}
+
+							//DO I NEED THIS? select this piece instead
+
+							//move here
+							if (!squares[x][y].isSelected()){
+								Globals.getSelectedSquare().setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.BLACK);
+								Globals.getSelectedSquare().toggleSelected();
+								Globals.getInstance().toggleSelected();
+								squares[x][y].toggleSelected();
+								Globals.getInstance().toggleSelected(squares[x][y]);
+								squares[x][y].setBackgroundColor(Color.RED);
+								squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.BLACK);
+							}
+						}
+						else {
+							System.out.println("running onclick - first else!");
+							//select this piece
+							squares[x][y].toggleSelected();
+							Globals.getInstance().toggleSelected(squares[x][y]);
+							squares[x][y].setBackgroundColor(Color.RED);
+						}
+						return;
+					}
+				});
+                 
 //            	 ImageButton im = new ImageButton(this);
                  im.setImageResource(R.drawable.ic_launcher);
 //                 im.setPadding(0, 0, 0, 0); //padding in each image if needed
@@ -88,40 +130,7 @@ public class PlayChess extends Activity {
 				String location;
 				location = "" + ((char)(c+97)) + "" + (r+1);
            		squares[r][c] = new Square(this, (((r+c) % 2) == 0) ? true : false, location);
-           		squares[r][c].setOnClickListener(new View.OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						if (Globals.getInstance().isSelectedPiece()){
-							//unselect this piece
-							if (squares[r][c].isSelected()){
-								squares[r][c].toggleSelected();
-								Globals.getInstance().toggleSelected();
-								squares[r][c].setBackgroundColor(squares[r][c].isWhite() ? Color.WHITE : Color.BLACK);
-							}
 
-							//DO I NEED THIS? select this piece instead
-
-							//move here
-							if (!squares[r][c].isSelected()){
-								Globals.getSelectedSquare().setBackgroundColor(squares[r][c].isWhite() ? Color.WHITE : Color.BLACK);
-								Globals.getSelectedSquare().toggleSelected();
-								Globals.getInstance().toggleSelected();
-								squares[r][c].toggleSelected();
-								Globals.getInstance().toggleSelected(squares[r][c]);
-								squares[r][c].setBackgroundColor(Color.RED);
-								squares[r][c].setBackgroundColor(squares[r][c].isWhite() ? Color.WHITE : Color.BLACK);
-							}
-						}
-						else {	
-							//select this piece
-							squares[r][c].toggleSelected();
-							Globals.getInstance().toggleSelected(squares[r][c]);
-							squares[r][c].setBackgroundColor(Color.RED);
-						}
-						return;
-					}
-				});
 			}
 		}
 	}

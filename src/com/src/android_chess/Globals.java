@@ -15,8 +15,8 @@ import android.widget.Toast;
 public class Globals {
 
 	private static Globals instance;
-	private static Square selectedSquare;
-	private static boolean selected;
+	private static Square selectedSquare = null;
+	private static boolean selected = false;
 	static {
         instance = new Globals();
     }
