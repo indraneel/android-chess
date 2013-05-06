@@ -181,6 +181,8 @@ public class Game {
 	 * @throws IllegalMoveException If the attempted move is not valid.
 	 */
 	public boolean move(Location src, Location dest) throws InvalidLocationException, IllegalMoveException {
+		System.out.println("[Move] Start.");
+		
 		if(!grid.isValid(src))
 			throw new InvalidLocationException(src);
 		if(!grid.isValid(dest))
@@ -192,6 +194,7 @@ public class Game {
 			return move(src, dest, 'Q');
 		}
 		if(p instanceof King && !p.getAttackedLocations().contains(dest)) {
+			System.out.println("[Move] Castling attempt?");
 			// Let's see if a castle is attempted.
 			King k = (King) p;
 			Rook r;
@@ -211,7 +214,7 @@ public class Game {
 
 			r = (Rook) temp;
 			if(!k.canCastle(r)) {
-				System.out.println("Castling move is illegal.");
+				System.out.println("[Move] Castling move is illegal.");
 				throw new IllegalMoveException("That castling move is not allowed.", p, dest);
 			}
 			
@@ -240,6 +243,7 @@ public class Game {
 				moves.append(new Move(src, dest, spec));
 		}
 		else {
+			System.out.println("[Move] Standard Move");
 			if(!p.canMove(dest))
 				throw new IllegalMoveException(p, dest);
 			Move m = new Move(src, dest);
