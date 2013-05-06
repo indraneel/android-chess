@@ -88,7 +88,7 @@ public class PlayChess extends Activity {
 								try {
 									game.move(src, dest);
 									Toast.makeText(getBaseContext(), "Moving to location " + dest, Toast.LENGTH_SHORT).show();
-									
+//									renderBoard();
 								}
 								catch(IllegalMoveException e) {
 									Toast.makeText(getBaseContext(), "That move is not allowed.", Toast.LENGTH_SHORT).show();
@@ -165,8 +165,44 @@ public class PlayChess extends Activity {
 				final int c = y;
 				String location;
 				location = "" + ((char)(c+97)) + "" + (r+1);
-           		squares[r][c] = new Square(this, (((r+c) % 2) == 0) ? true : false, location);
+           		squares[r][c] = new Square(this, (((r+c) % 2) != 0) ? true : false, location);
 
+			}
+		}
+	}
+	
+	private void renderBoard() {
+		for(int rank = 7; rank >= 0; rank--) {
+			for(int file = 0; file < 8; file++) {
+				Piece p = game.getGrid().get(new Location(rank, file));
+				if(p == null)
+					continue;
+				
+				String type = p.getAlgebraicName();
+				if(type.equals("")) {
+					// Pawn
+					// p is the piece
+					// To determine if the piece is white, call p.isWhite()
+					// (true if the piece is white; false if it is black)
+					if(p.isWhite())
+						;
+//					squares[rank][file].setPicture(p.isWhite() ? pawn_white.jpg : pawn_black.jpg);
+				}
+				else if(type.equals("N")) {
+					// Knight
+				}
+				else if(type.equals("B")) {
+					// Bishop
+				}
+				else if(type.equals("R")) {
+					// Rook
+				}
+				else if(type.equals("Q")) {
+					// Queen
+				}
+				else if(type.equals("K")) {
+					// King
+				}
 			}
 		}
 	}
