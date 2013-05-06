@@ -210,8 +210,10 @@ public class Game {
 				throw new IllegalMoveException(p, dest);
 
 			r = (Rook) temp;
-			if(!k.canCastle(r))
+			if(!k.canCastle(r)) {
+				System.out.println("Castling move is illegal.");
 				throw new IllegalMoveException("That castling move is not allowed.", p, dest);
+			}
 			
 			// Save the old state.
 			previousState = new GameState(whiteTurn, new Chessboard(grid.getEntrySet()),
@@ -224,6 +226,10 @@ public class Game {
 			Location loc = k.getLocation().getAdjacentLocation(dir).getAdjacentLocation(dir);
 			grid.put(loc, k);
 			grid.put(loc.getAdjacentLocation(-dir), r);
+			
+			// Update
+			for (Piece piece : pieces)
+				piece.getMoves();
 			updateControlledLocations();
 			
 			// Adding to the moves list
@@ -251,12 +257,20 @@ public class Game {
 					ep_capture, ep_pawn);
 			
 			// Time to actually move the piece.
-			ep_capture = null;
-			ep_pawn = null;
 			Piece target = grid.put(dest, p);
-			if(p instanceof Pawn && dest.equals(previousState.ep_loc)) {
-				target = previousState.ep_pawn;
-				move.setSpecial(Move.Special.EN_PASSANT);
+			if(p instanceof Pawn) {
+				if (dest.equals(previousState.ep_loc)) {
+					// En passant capture
+					target = previousState.ep_pawn;
+					grid.remove(ep_pawn.getLocation());
+					move.setSpecial(Move.Special.EN_PASSANT);
+				}
+				else if (Math.abs(src.getRank() - dest.getRank()) == 2) {
+					// En passant move
+					ep_capture = new Location(dest.getRank() + (p.isWhite() ? -1 : 1), src.getFile());
+					ep_pawn = (Pawn) p;
+					System.out.println("[New] En-passant set to " + p + ", " + ep_capture);
+				}
 			}
 			if(target != null) {
 				pieces.remove(target);
@@ -386,16 +400,6 @@ public class Game {
 		}
 		
 		return inCheck;
-	}
-	
-	/**
-	 * Sets data on en passant capture.
-	 * @param p The pawn moved for en passant.
-	 * @param loc The en passant capture location per Forsyth-Edwards Notation.
-	 */
-	public void setEnPassant(Pawn p, Location loc) {
-		this.ep_pawn = p;
-		this.ep_capture = loc;
 	}
 	
 	/**

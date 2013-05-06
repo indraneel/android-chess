@@ -31,7 +31,7 @@ public class King extends Piece {
 	@Override
 	public Piece copy() {
 		King k = new King(isWhite(), getGame(), getLocation().copy());
-		k.start = start;
+		k.start = start.copy();
 		return k;
 	}
 	

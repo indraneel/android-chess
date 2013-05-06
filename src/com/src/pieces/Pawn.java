@@ -95,16 +95,6 @@ public class Pawn extends Piece {
 	}
 	
 	@Override
-	public void setLocation(Location loc) {
-		if(loc != null && getLocation() != null) {
-			int delta_y = Math.abs(loc.getRank() - getLocation().getRank());
-			if(delta_y == 2)
-				getGame().setEnPassant(this, ep);
-		}
-		super.setLocation(loc);
-	}
-
-	@Override
 	public char toFEN() {
 		return isWhite() ? 'P' : 'p';
 	}
