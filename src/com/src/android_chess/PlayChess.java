@@ -25,30 +25,39 @@ public class PlayChess extends Activity {
 	private Square selected;
 	private Location selectedLocation;
 	private Game game;
+	private LinearLayout linearLayout;
+	private TableLayout table;
+	private TableRow tr;
+	private Display mDisplay;
+	private int displayHeight, displayWidth;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mDisplay = this.getWindowManager().getDefaultDisplay();
+		displayHeight = mDisplay.getHeight();
 		setContentView(R.layout.chessboard);
-		Globals.getInstance().toaster(getApplicationContext(), "setContentView done!");
 		generateBoard();
-		Globals.getInstance().toaster(getApplicationContext(), "generated Board!");
 		game = new Game(new Chessboard());
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.start, menu);
+		getMenuInflater().inflate(R.menu.gamemenu, menu);
 		return true;
 	}
 	
 	private void generateBoard(){
-		 LinearLayout linearLayout = (LinearLayout) this.findViewById(R.id.chessboard);
+		 linearLayout = (LinearLayout) this.findViewById(R.id.chessboard);
 		 linearLayout.removeAllViews();
-	     TableLayout table = new TableLayout(this);
+		 linearLayout.invalidate();
+		 linearLayout.refreshDrawableState();
+	     table = new TableLayout(this);
+	     table.removeAllViews();
+	     table.invalidate();
+	     table.refreshDrawableState();
 	     linearLayout.addView(table);
-	     Globals.getInstance().toaster(getApplicationContext(), "added table to linearlayout!");
 	     table.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 	     table.setStretchAllColumns(true);
 	     table.setOrientation(LinearLayout.VERTICAL);
@@ -56,7 +65,10 @@ public class PlayChess extends Activity {
 	     
 	     //this is 1-8
          for (int r=7; r>=0; r--){
-             TableRow tr = new TableRow(this);
+             tr = new TableRow(this);
+             tr.removeAllViews();
+             tr.invalidate();
+             tr.refreshDrawableState();
              table.addView(tr);
              tr.setLayoutParams(new TableLayout.LayoutParams(
                      LayoutParams.WRAP_CONTENT,
@@ -67,18 +79,16 @@ public class PlayChess extends Activity {
 //            	 TextView im = new TextView(this);
             	 final int x = r, y = c;
             	 
-                 ImageView im = squares[r][c];
+                 Square im = squares[r][c];
                  im.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						// TODO Auto-generated method stub
-						System.out.println("running onclick!");
 						if (selected != null){
-							System.out.println("running onclick - first if!");
 							//unselect this piece
 							if (squares[x][y] == selected){
 								Toast.makeText(getBaseContext(), "Unselecting a square.", Toast.LENGTH_SHORT).show();
-								squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.BLACK);
+								squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.GRAY);
 								selected = null;
 								return;
 							}
@@ -88,14 +98,18 @@ public class PlayChess extends Activity {
 								try {
 									game.move(src, dest);
 									Toast.makeText(getBaseContext(), "Moving to location " + dest, Toast.LENGTH_SHORT).show();
-//									renderBoard();
+									squares[dest.getRank()][dest.getFile()].removePiece();
+									squares[dest.getRank()][dest.getFile()].addPiece(squares[x][y].getPiece());
+									switchImage(squares[dest.getRank()][dest.getFile()]);
+									squares[x][y].removePiece();
+									switchImage(squares[x][y]);
 								}
 								catch(IllegalMoveException e) {
 									Toast.makeText(getBaseContext(), "That move is not allowed.", Toast.LENGTH_SHORT).show();
 									return;
 								}
 								finally {
-									selected.setBackgroundColor(selected.isWhite() ? Color.WHITE : Color.BLACK);
+									selected.setBackgroundColor(selected.isWhite() ? Color.WHITE : Color.GRAY);
 									selected = null;
 									selectedLocation = null;
 								}
@@ -129,36 +143,82 @@ public class PlayChess extends Activity {
 //            	 ImageButton im = new ImageButton(this);
                  //black back row
                  if (r==7){
-                     im.setImageResource(R.drawable.ic_launcher);
-
+                     //rook
+                     if (c==0 || c==7){
+                    	 im.setImageResource(R.drawable.blackrook);
+                     }
+                     //knight
+                     else if (c==1 || c==6){
+                    	 im.setImageResource(R.drawable.blackknight);
+                     }
+                     //bishop
+                     else if (c==2 || c==5){
+                    	 im.setImageResource(R.drawable.blackbishop);
+                     }
+                     //queen
+                     else if (c==3){
+                    	 im.setImageResource(R.drawable.blackqueen);
+                     }
+                     //king
+                     else if (c==4){
+                    	 im.setImageResource(R.drawable.blackking);
+                     }
+                     else {
+                    	 im.setImageResource(R.drawable.ic_launcher);
+                     }
                  }
                  //black pawns
-                 if (r==6){
-                	 im.setImageResource()
+                 else if (r==6){
+                	 im.setImageResource(R.drawable.blackpawn);
                  }
                  //white pawns
-                 if (r==1){
-                	 
+                 else if (r==1){
+                	 im.setImageResource(R.drawable.whitepawn);
                  }
                  //white back row
-                 if (r==0){
-                     im.setImageResource(R.drawable.ic_launcher);
-
+                 else if (r==0){
+                     //rook
+                     if (c==0 || c==7){
+                    	 im.setImageResource(R.drawable.whiterook);
+                     }
+                     //knight
+                     else if (c==1 || c==6){
+                    	 im.setImageResource(R.drawable.whiteknight);
+                     }
+                     //bishop
+                     else if (c==2 || c==5){
+                    	 im.setImageResource(R.drawable.whitebishop);
+                     }
+                     //queen
+                     else if (c==3){
+                    	 im.setImageResource(R.drawable.whitequeen);
+                    	 
+                     }
+                     //king
+                     else if (c==4){
+                    	 im.setImageResource(R.drawable.whiteking);
+                     }
+                     else {
+                    	 im.setImageResource(R.drawable.ic_launcher);
+                     }                     
+                 }
+                 else {
+                	 im.setImageResource(R.drawable.transparent);
                  }
 //                 im.setPadding(0, 0, 0, 0); //padding in each image if needed
         		 im.setAdjustViewBounds(true);
         		 
         		 // Grabbing the width
-        		 Display mDisplay = this.getWindowManager().getDefaultDisplay();
-        		 int height = mDisplay.getHeight();
         		 
-        		 im.setMaxHeight(height / 10);
+        		 im.setMinimumHeight(displayHeight/10);
+        		 im.setMinimumWidth(20);
+        		 im.setMaxHeight(displayHeight / 10);
         		 im.setMaxWidth(20);
             	 if (squares[r][c].isWhite()){
             		 im.setBackgroundColor(Color.WHITE);
             	 }
             	 else {
-            		 im.setBackgroundColor(Color.BLACK);
+            		 im.setBackgroundColor(Color.GRAY);
             	 }
             	 
                  im.setLayoutParams(new TableRow.LayoutParams(
@@ -188,45 +248,138 @@ public class PlayChess extends Activity {
 		}
 	}
 	
+	private void switchImage(Square im){
+		Location loc = new Location(im.getLocation());
+		if(game.getGrid().isOccupied(loc)) {
+			Piece p = game.getGrid().get(loc);
+			String type = p.getAlgebraicName();
+			Globals.getInstance().toaster(getApplicationContext(), type);
+			if(type.equals("")) {
+				im.setImageResource(p.isWhite() ? R.drawable.whitepawn : R.drawable.blackpawn);
+			}
+			else if(type.equals("N")) {
+				im.setImageResource(p.isWhite() ? R.drawable.whiteknight : R.drawable.blackknight);
+			}
+			else if(type.equals("B")) {
+				im.setImageResource(p.isWhite() ? R.drawable.whitebishop : R.drawable.blackbishop);
+			}
+			else if(type.equals("R")) {
+				im.setImageResource(p.isWhite() ? R.drawable.whiterook : R.drawable.blackrook);
+			}
+			else if(type.equals("Q")) {
+				im.setImageResource(p.isWhite() ? R.drawable.whitequeen : R.drawable.blackqueen);
+			}
+			else if(type.equals("K")) {
+				im.setImageResource(p.isWhite() ? R.drawable.whiteking : R.drawable.blackking);
+			}
+		}
+		else {
+			im.setImageResource(R.drawable.transparent);
+		}
+		
+		im.setAdjustViewBounds(true);
+		 
+		im.setMinimumHeight(displayHeight/10);
+		im.setMinimumWidth(20);
+		im.setMaxHeight(displayHeight / 10);
+		im.setMaxWidth(20);
+    	if (im.isWhite()){
+    		im.setBackgroundColor(Color.WHITE);
+    	}
+    	else {
+    		im.setBackgroundColor(Color.GRAY);
+    	}
+	}
+	/*
 	private void renderBoard() {
+//		linearLayout = (LinearLayout) this.findViewById(R.id.chessboard);
+		linearLayout.removeAllViews();
+//		table = new TableLayout(this);
+		table.removeAllViews();
+		linearLayout.addView(table);
+		table.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+		table.setStretchAllColumns(true);
+		table.setOrientation(LinearLayout.VERTICAL);
+		
 		for(int rank = 7; rank >= 0; rank--) {
+			tr.removeAllViews();
+			tr = new TableRow(this);
+			table.addView(tr);
+			tr.setLayoutParams(new TableLayout.LayoutParams(
+					LayoutParams.WRAP_CONTENT,
+					LayoutParams.WRAP_CONTENT));
+			
 			for(int file = 0; file < 8; file++) {
-				Piece p = game.getGrid().get(new Location(rank, file));
-				if(p == null)
-					continue;
+				Location loc = new Location(rank, file);
+				Square im = squares[rank][file];
+				if(game.getGrid().isOccupied(loc)) {
+					Piece p = game.getGrid().get(loc);
+					String type = p.getAlgebraicName();
+					if(type.equals("")) {
+						im.setImageResource(p.isWhite() ? R.drawable.whitepawn : R.drawable.blackpawn);
+					}
+					else if(type.equals("N")) {
+						im.setImageResource(p.isWhite() ? R.drawable.whiteknight : R.drawable.blackknight);
+					}
+					else if(type.equals("B")) {
+						im.setImageResource(p.isWhite() ? R.drawable.whitebishop : R.drawable.blackbishop);
+					}
+					else if(type.equals("R")) {
+						im.setImageResource(p.isWhite() ? R.drawable.whiterook : R.drawable.blackrook);
+					}
+					else if(type.equals("Q")) {
+						im.setImageResource(p.isWhite() ? R.drawable.whitequeen : R.drawable.blackqueen);
+					}
+					else if(type.equals("K")) {
+						im.setImageResource(p.isWhite() ? R.drawable.whiteking : R.drawable.blackking);
+					}
+				}
+				else {
+					im.setImageResource(R.drawable.transparent);
+				}
 				
-				String type = p.getAlgebraicName();
-				if(type.equals("")) {
-					// Pawn
-					// p is the piece
-					// To determine if the piece is white, call p.isWhite()
-					// (true if the piece is white; false if it is black)
-					if(p.isWhite())
-						;
-//					squares[rank][file].setPicture(p.isWhite() ? pawn_white.jpg : pawn_black.jpg);
-				}
-				else if(type.equals("N")) {
-					// Knight
-				}
-				else if(type.equals("B")) {
-					// Bishop
-				}
-				else if(type.equals("R")) {
-					// Rook
-				}
-				else if(type.equals("Q")) {
-					// Queen
-				}
-				else if(type.equals("K")) {
-					// King
-				}
+				im.setAdjustViewBounds(true);
+				im.setMinimumHeight(displayHeight/10);
+       		 	im.setMinimumWidth(20);
+       		 	im.setMaxHeight(displayHeight / 10);
+       		 	im.setMaxWidth(20);
+       		 	if (squares[rank][file].isWhite()){
+       		 		im.setBackgroundColor(Color.WHITE);
+       		 	}
+       		 	else {
+       		 		im.setBackgroundColor(Color.GRAY);
+       		 	}
+           	 
+                im.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT,
+                        TableRow.LayoutParams.WRAP_CONTENT));
+                
+                tr.removeAllViews();
+                tr.invalidate();
+                tr.refreshDrawableState();
+                tr.addView(im);
+				//** end here ***
 			}
 		}
 	}
 	
-	private void addPieces(){
+	*/
+	public void draw(){
 		
 	}
+	
+	public void ai(){
+		
+	}
+
+	public void resign(){
+	
+	}
+
+	public void undo(){
+	
+	}
+	
 	
 	public void playGame(View view){
 		System.out.println("Play game!");

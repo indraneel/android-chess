@@ -7,5 +7,9 @@
     <string name="play_chess">Play Chess!</string>
     <string name="record_game">Record Games</string>
     <string name="game_playback">Game Playback</string>
+    <string name="draw">Draw</string>
+    <string name="resign">Resign</string>
+    <string name="undo">Undo</string>
+    <string name="ai">AI</string>
 
 </resources>

@@ -42,12 +42,12 @@ public class Square extends ImageView {
 		this.piece = p;
 	}
 	
-	public boolean removePiece(){
+	public void removePiece(){
 		if (this.piece == null){
-			return false;
+			return;
 		}
 		this.piece = null;
-		return true;
+		return;
 	}
 	
 	public void toggleSelected(){
