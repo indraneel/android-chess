@@ -187,6 +187,10 @@ public class Game {
 			throw new InvalidLocationException(dest);
 		
 		Piece p = grid.get(src);
+		if(p instanceof Pawn && dest.getRank() == (p.isWhite() ? 7 : 0)) {
+			// Pawn promotion
+			return move(src, dest, 'Q');
+		}
 		if(p instanceof King && !p.getAttackedLocations().contains(dest)) {
 			// Let's see if a castle is attempted.
 			King k = (King) p;
@@ -350,6 +354,10 @@ public class Game {
 						+ " valid piece you may promote to. Must be Q, R, B, or N.");
 		}
 		
+		// Save the previous state.
+		previousState = new GameState(whiteTurn, new Chessboard(grid.getEntrySet()), ep_capture, ep_pawn);
+		
+		// Make the move.
 		Piece target = grid.put(dest, upgrade);
 		grid.remove(src);
 		if(target != null) {

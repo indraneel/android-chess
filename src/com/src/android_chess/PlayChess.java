@@ -1,6 +1,6 @@
 package com.src.android_chess;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import android.app.Activity;
@@ -35,6 +35,7 @@ public class PlayChess extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		// TODO reverting to sideways view calls onCreate and restarts
 		super.onCreate(savedInstanceState);
 		mDisplay = this.getWindowManager().getDefaultDisplay();
 		displayHeight = mDisplay.getHeight();
@@ -50,6 +51,47 @@ public class PlayChess extends Activity {
 		return true;
 	}
 	
+	/**
+	 * Renders the entire board to the screen.
+	 */
+	private void renderBoard() {
+		Chessboard board = game.getGrid();
+		for(int rank = 7; rank >= 0; rank--) {
+			for(int file = 0; file < 8; file++) {
+				Square s = squares[rank][file];
+				Location loc = new Location(rank, file);
+				if(board.isOccupied(loc)) {
+					Piece p = board.get(loc);
+					if(p.getAlgebraicName().equals("")) {
+						s.setImageResource(p.isWhite() ? R.drawable.whitepawn : R.drawable.blackpawn);
+					}
+					else if(p.getAlgebraicName().equalsIgnoreCase("K")) {
+						s.setImageResource(p.isWhite() ? R.drawable.whiteking : R.drawable.blackking);
+					}
+					else if(p.getAlgebraicName().equalsIgnoreCase("Q")) {
+						s.setImageResource(p.isWhite() ? R.drawable.whitequeen : R.drawable.blackqueen);
+					}
+					else if(p.getAlgebraicName().equalsIgnoreCase("R")) {
+						s.setImageResource(p.isWhite() ? R.drawable.whiterook : R.drawable.blackrook);
+					}
+					else if(p.getAlgebraicName().equalsIgnoreCase("N")) {
+						s.setImageResource(p.isWhite() ? R.drawable.whiteknight : R.drawable.blackknight);
+					}
+					else if(p.getAlgebraicName().equalsIgnoreCase("B")) {
+						s.setImageResource(p.isWhite() ? R.drawable.whitebishop : R.drawable.blackbishop);
+					}
+					else
+						System.out.println("Found an unknown piece");
+				}
+				else
+					s.setImageResource(R.drawable.transparent);
+			}
+		}
+	}
+	
+	/**
+	 * Generates the board and adds click listeners to each view.
+	 */
 	private void generateBoard(){
 		 linearLayout = (LinearLayout) this.findViewById(R.id.chessboard);
 		 linearLayout.removeAllViews();
@@ -85,11 +127,8 @@ public class PlayChess extends Activity {
                  im.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
 						if (selected != null){
-							//unselect this piece
 							if (squares[x][y] == selected){
-								Toast.makeText(getBaseContext(), "Unselecting a square.", Toast.LENGTH_SHORT).show();
 								squares[x][y].setBackgroundColor(squares[x][y].isWhite() ? Color.WHITE : Color.GRAY);
 								selected = null;
 								return;
@@ -98,8 +137,9 @@ public class PlayChess extends Activity {
 								Location src = selectedLocation;
 								Location dest = new Location(x, y);
 								try {
-									game.move(src, dest);
-									Toast.makeText(getBaseContext(), "Moving to location " + dest, Toast.LENGTH_SHORT).show();
+									boolean inCheck = game.move(src, dest);
+									if(inCheck)
+										Toast.makeText(getBaseContext(), "Check!", Toast.LENGTH_LONG).show();
 //									squares[dest.getRank()][dest.getFile()].removePiece();
 //									squares[dest.getRank()][dest.getFile()].addPiece(squares[x][y].getPiece());
 //									squares[src.getRank()][src.getFile()].removePiece();
@@ -108,7 +148,21 @@ public class PlayChess extends Activity {
 									renderBoard();
 								}
 								catch(IllegalMoveException e) {
-									Toast.makeText(getBaseContext(), "That move is not allowed.", Toast.LENGTH_SHORT).show();
+									StringBuilder sb = new StringBuilder();
+									sb.append(e.getPiece() + " cannot move to " + e.getLocation() + ".");
+									sb.append('\n');
+									
+									ArrayList<Location> locs = e.getPiece().getMoves();
+									if(locs.isEmpty())
+										sb.append("This piece has no available moves.");
+									else {
+										sb.append(e.getPiece() + " can move to: ");
+										for(Location loc : e.getPiece().getMoves()) {
+											sb.append(loc);
+											sb.append(' ');
+										}
+									}
+									Toast.makeText(getBaseContext(), sb.toString(), Toast.LENGTH_LONG).show();
 									return;
 								}
 								finally {
@@ -121,14 +175,13 @@ public class PlayChess extends Activity {
 						else {
 							Location loc = new Location(x, y);
 							if(game.getGrid().get(loc) == null) {
-								Toast.makeText(getBaseContext(), "Cannot select an empty location.", Toast.LENGTH_SHORT).show();
 								return;
 							}
 							
 							Piece p = game.getGrid().get(loc);
 							if(p.isWhite() != game.isWhitesTurn()) {
-								Toast.makeText(getBaseContext(), "You can only move your own pieces. It's " +
-										(game.isWhitesTurn() ? "white's" : "black's") + "turn.", Toast.LENGTH_SHORT).show();
+								Toast.makeText(getBaseContext(), "You can only move your own pieces.\nIt's " +
+										(game.isWhitesTurn() ? "white's" : "black's") + " turn.", Toast.LENGTH_SHORT).show();
 								return;
 							}
 							
@@ -138,7 +191,6 @@ public class PlayChess extends Activity {
 							selected = squares[x][y];
 							selectedLocation = new Location(x, y);
 							squares[x][y].setBackgroundColor(Color.RED);
-							Toast.makeText(getBaseContext(), "Selected " + game.getGrid().get(selectedLocation).toString(), Toast.LENGTH_SHORT).show();
 						}
 					}
 				});
@@ -251,6 +303,7 @@ public class PlayChess extends Activity {
 		}
 	}
 	
+	@Deprecated
 	private void switchImage(Square im){
 		Location loc = new Location(im.getLocation());
 		Globals.getInstance().toaster(getApplicationContext(), "location:" + loc);
@@ -400,10 +453,7 @@ public class PlayChess extends Activity {
 	 */
 	public void resign() {
 		boolean white = game.isWhitesTurn();
-		Toast.makeText(this, white ? "White resigned!" : "Black resigned!", Toast.LENGTH_SHORT).show();
-		if(Globals.getInstance().isSavingGames()) {
-			
-		}
+		// TODO new view to report result
 	}
 
 	/**
