@@ -14,7 +14,6 @@ import com.src.grid.Location;
 public abstract class Piece {
 	private boolean color;
 	private Game game;
-	private Grid<Piece> grid;
 	private Location location;
 	private ArrayList<Location> moves;
 	
@@ -33,9 +32,6 @@ public abstract class Piece {
 		
 		this.color = isWhite;
 		this.game = game;
-		this.grid = game.getGrid();
-		if(grid == null)
-			throw new IllegalStateException("Grid from game is null");
 		this.location = location;
 		if(location != null)
 			this.moves = getMoveLocations();
@@ -47,8 +43,14 @@ public abstract class Piece {
 	 * @return True if this piece can move to that location; false otherwise.
 	 */
 	public boolean canMove(Location loc) {
+		moves = getMoveLocations();
 		return moves.contains(loc);
 	}
+	
+	/**
+	 * @return A copy of this piece.
+	 */
+	public abstract Piece copy();
 	
 	/**
 	 * Two pieces are equal if and only if they are the same color and occupy
@@ -92,7 +94,7 @@ public abstract class Piece {
 	 * @return The grid on which this piece lies.
 	 */
 	public Grid<Piece> getGrid() {
-		return grid;
+		return game.getGrid();
 	}
 	
 	/**
@@ -144,10 +146,6 @@ public abstract class Piece {
 	 */
 	public void setLocation(Location loc) {
 		location = loc;
-//		if(location != null)
-//			moves = getMoveLocations();
-//		else
-//			moves = null;
 	}
 	
 	/**

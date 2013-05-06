@@ -18,6 +18,11 @@ public class Bishop extends Piece {
 	}
 	
 	@Override
+	public Piece copy() {
+		return new Bishop(isWhite(), getGame(), getLocation().copy());
+	}
+	
+	@Override
 	public char toFEN() {
 		return isWhite() ? 'B' : 'b';
 	}

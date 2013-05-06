@@ -20,6 +20,13 @@ public class Rook extends Piece {
 	}
 	
 	@Override
+	public Piece copy() {
+		Rook r = new Rook(isWhite(), getGame(), getLocation().copy());
+		r.start = start;
+		return r;
+	}
+	
+	@Override
 	public ArrayList<Location> getAttackedLocations() {
 		ArrayList<Location> locs = new ArrayList<Location>();
 		for(int dir = 0; dir < 360; dir += 90) {

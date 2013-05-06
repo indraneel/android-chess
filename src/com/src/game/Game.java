@@ -3,8 +3,10 @@ package com.src.game;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 
-import com.src.grid.Grid;
+import com.src.grid.Chessboard;
 import com.src.grid.Location;
 import com.src.move.IllegalMoveException;
 import com.src.move.InCheckException;
@@ -25,14 +27,18 @@ import com.src.pieces.Rook;
  */
 public class Game {
 	// Pieces and grid information
-	private ArrayList<Piece> pieces, captured;
-	private Grid<Piece> grid;
+	private ArrayList<Piece> pieces;
+	private Chessboard grid;
 	private HashSet<Location> white_locs, black_locs;
 	
 	// Move and turn information
 	private boolean isRecording;
 	private MoveSequence moves;
 	private boolean whiteTurn;
+	
+	// For undoing the last move
+	private GameState previousState;
+	private boolean canUndo;
 	
 	// Information related to en passant
 	private Location ep_capture;
@@ -44,14 +50,12 @@ public class Game {
 	// Moves when in check
 	private HashSet<Move> escape_moves;
 	
-	// TODO CASTLING! EN PASSANT!
-	
 	/**
 	 * Create a new game on the given board. Moves will automatically be
 	 * recorded.
 	 * @param grid The board on which the game will be played.
 	 */
-	public Game(Grid<Piece> grid) {
+	public Game(Chessboard grid) {
 		this(grid, true);
 	}
 	
@@ -60,15 +64,15 @@ public class Game {
 	 * @param grid The board on which the game will be played.
 	 * @param recordable True if games should be recorded; false otherwise.
 	 */
-	public Game(Grid<Piece> grid, boolean recordable) {
+	public Game(Chessboard grid, boolean recordable) {
 		super();
 		this.grid = grid;
-		this.captured = new ArrayList<Piece>(30);
 		this.black_locs = new HashSet<Location>(32);
 		this.white_locs = new HashSet<Location>(32);
 		this.whiteTurn = true;
 		this.isRecording = recordable;
 		this.moves = new MoveSequence();
+		this.canUndo = false;
 		defaultPosition();
 		updateControlledLocations();
 		for(Piece p : pieces) {
@@ -77,17 +81,17 @@ public class Game {
 	}
 	
 	/**
+	 * @return True if you can undo the last move; false otherwise.
+	 */
+	public boolean canUndo() {
+		return canUndo;
+	}
+	
+	/**
 	 * @return All active, non-captured pieces still on the board.
 	 */
 	public ArrayList<Piece> getActivePieces() {
 		return pieces;
-	}
-	
-	/**
-	 * @return All pieces captured during this game.
-	 */
-	public ArrayList<Piece> getCapturedPieces() {
-		return captured;
 	}
 
 	/**
@@ -97,7 +101,7 @@ public class Game {
 	public Location getEnPassantLocation() {
     	return ep_capture;
     }
-
+	
 	/**
 	 * @return The pawn that just made a two-square move, or <code>null</code>
 	 * if not applicable.
@@ -105,14 +109,14 @@ public class Game {
 	public Pawn getEnPassantPawn() {
     	return ep_pawn;
     }
-	
+
 	/**
 	 * @return The grid on which this game is played.
 	 */
-	public Grid<Piece> getGrid() {
+	public Chessboard getGrid() {
 		return grid;
 	}
-
+	
 	/**
 	 * @return The set of all locations that are attacked by a black piece.
 	 * Locations occupied by a black piece but not defended by another piece
@@ -140,6 +144,31 @@ public class Game {
 	 */
 	public boolean isWhitesTurn() {
 		return whiteTurn;
+	}
+	
+	/**
+	 * Automatically makes a move for the current player. This randomly selects
+	 * one of the valid moves and plays it. If no move is available, this
+	 * method does nothing.
+	 * TODO change that behavior?
+	 */
+	public void makeAutomaticMove() {
+		ArrayList<Move> moves = new ArrayList<Move>();
+		for(Piece p : this.pieces) {
+			if(isWhitesTurn() != p.isWhite())
+				continue;
+			
+			for(Location loc : p.getMoves()) {
+				if(loc != null)
+					moves.add(new Move(p.getLocation(), loc));
+			}
+		}
+		
+		if(moves.isEmpty())
+			throw new NoSuchElementException("No moves.");
+		Move m = moves.get((int)(Math.random() * moves.size()));
+		// TODO possible castle, possible pawn promotion
+		move(m.getSource(), m.getDestination());
 	}
 	
 	/**
@@ -180,6 +209,10 @@ public class Game {
 			if(!k.canCastle(r))
 				throw new IllegalMoveException("That castling move is not allowed.", p, dest);
 			
+			// Save the old state.
+			previousState = new GameState(whiteTurn, new Chessboard(grid.getEntrySet()),
+					ep_capture, ep_pawn); 
+			
 			// Let's make the castling move.
 			ep_capture = null;
 			ep_pawn = null;
@@ -192,12 +225,9 @@ public class Game {
 			// Adding to the moves list
 			Move.Special spec = (dest.getFile() == 2 ? Move.Special.QUEENSIDE_CASTLE
 					: Move.Special.KINGSIDE_CASTLE);
-			moves.append(new Move(src, dest, spec));
 			
-//			Technically this should be done by the grid itself when we change
-//			their locations.
-//			k.setLocation(loc);
-//			r.setLocation(k.getLocation().getAdjacentLocation(-dir));
+			if(isRecording)
+				moves.append(new Move(src, dest, spec));
 		}
 		else {
 			if(!p.canMove(dest))
@@ -207,27 +237,34 @@ public class Game {
 				System.out.println(m);
 				throw new InCheckException(escape_moves);
 			}
-	// TODO pawn promotion
-			// Reset the en passant square
-			Location old_ep = ep_capture = null;
-			Pawn old_pawn = ep_pawn = null;
+			
+			// Set up the move
+			Move move = new Move(src, dest);
+			
+			// Store the previous states
+			GameState prev = previousState;
+			previousState = new GameState(whiteTurn, new Chessboard(grid.getEntrySet()),
+					ep_capture, ep_pawn);
 			
 			// Time to actually move the piece.
+			ep_capture = null;
+			ep_pawn = null;
 			Piece target = grid.put(dest, p);
-			if(p instanceof Pawn && dest.equals(old_ep)) {
-				target = old_pawn;
+			if(p instanceof Pawn && dest.equals(previousState.ep_loc)) {
+				target = previousState.ep_pawn;
+				move.setSpecial(Move.Special.EN_PASSANT);
 			}
 			if(target != null) {
 				pieces.remove(target);
-				captured.add(target);
 			}
 			updateControlledLocations();
 			
 			// Cannot make moves that put your own king in check.
 			if(isInCheck()) {
-				ep_capture = old_ep;
-				ep_pawn = old_pawn;
+				ep_capture = previousState.ep_loc;
+				ep_pawn = previousState.ep_pawn;
 				grid.put(src, p);
+				previousState = prev;
 				if(target != null) {
 					grid.put(dest, target);
 					pieces.add(target);
@@ -240,12 +277,14 @@ public class Game {
 			}
 		
 			// Adding to the moves list.
-			moves.append(new Move(src, dest));
+			if(isRecording)
+				moves.append(move);
 		}
 		
 		
 		// Switch turns.
 		whiteTurn = !whiteTurn;
+		canUndo = true;
 		
 		boolean inCheck = isInCheck();
 		for(Piece piece : pieces)
@@ -313,12 +352,17 @@ public class Game {
 		
 		Piece target = grid.put(dest, upgrade);
 		grid.remove(src);
+		if(target != null) {
+			pieces.remove(target);
+		}
 		
 		// Switch turns.
 		whiteTurn = !whiteTurn;
+		canUndo = true;
 		
 		// Adding to the moves list.
-		moves.append(new Move(src, dest, Move.Special.parseChar(promotion)));
+		if(isRecording)
+			moves.append(new Move(src, dest, Move.Special.parseChar(promotion)));
 		
 		boolean inCheck = isInCheck();
 		for(Piece piece : pieces)
@@ -347,53 +391,77 @@ public class Game {
 	}
 	
 	/**
-	 * Automatically makes a move for the current player. This randomly selects
-	 * one of the valid moves and plays it. If no move is available, this
-	 * method does nothing.
-	 * TODO change that behavior?
+	 * @param grid Swaps out this game's chessboard for the given board.
 	 */
-	public void makeAutomaticMove() {
-		ArrayList<Move> moves = new ArrayList<Move>();
-		for(Piece p : this.pieces) {
-			if(isWhitesTurn() != p.isWhite())
-				continue;
-			
-			for(Location loc : p.getMoves()) {
-				if(loc != null)
-					moves.add(new Move(p.getLocation(), loc));
-			}
+	public void setGrid(Chessboard grid) {
+		this.grid = grid;
+		pieces.clear();
+		for(Entry<Location, Piece> e : grid.getEntrySet()) {
+			e.getValue().setLocation(e.getKey());
+			pieces.add(e.getValue());
 		}
-		
-		if(moves.isEmpty())
-			return;
-		Move m = moves.get((int)(Math.random() * moves.size()));
-		// TODO possible castle, possible pawn promotion
-		move(m.getSource(), m.getDestination());
 	}
-
+	
+	/**
+	 * Saves this game in a format that can be played again.
+	 * @param title A name for this game.
+	 * @return An object that can replay the game, or <code>null</code> if the
+	 * game is not recording.
+	 */
+	public Playback toPlayback(String title) {
+		if(!isRecording)
+			return null;
+		else
+			return new Playback(moves, title);
+	}
+	
 	/**
 	 * @return All of the moves played, in extended notation. If no move has
-	 * been played, this method returns the empty string.
+	 * been played, this method returns <code>"No moves played."</code>
 	 */
 	@Override
 	public String toString() {
 		if(moves.isEmpty()) {
-			System.out.println("Moves is empty");
 			return "";
 		}
 		
 		StringBuilder sb = new StringBuilder();
 		moves.reset();
-		for(int i = 1; moves.has(); i++, moves.nextMove()) {
-			System.out.println("Examining move " + moves.currentMove());
+		
+		int i = 1;
+		while (moves.currentMove() != null) {
 			if(i % 2 == 1) {
 				sb.append((i + 1) / 2);
 				sb.append(". ");
 			}
+			
 			sb.append(moves.currentMove().toString());
 			sb.append(' ');
+			moves.nextMove();
+			i++;
 		}
+		
 		return sb.toString();
+	}
+
+	/**
+	 * Takes back the last move played.
+	 */
+	public void undo() {
+		if(!canUndo)
+			return;
+		
+		// Revert to the previous state.
+		setGrid(previousState.board);
+		ep_capture = previousState.ep_loc;
+		ep_pawn = previousState.ep_pawn;
+		whiteTurn = previousState.isWhitesTurn;
+		moves.delete();
+		
+		// Prevent another takeback.
+		previousState = null;
+		canUndo = false;
+
 	}
 	
 	/**

@@ -39,9 +39,9 @@ public class Start extends Activity {
 	 * @param view
 	 */
 	public void setRecord(View view){
-		Globals.getInstance().toggle();
+		Globals.getInstance().toggleSavingGames();
 		Context context = getApplicationContext();
-		CharSequence text = Globals.getInstance().getValue() ? "Game will be recorded!" : "Recording off!";
+		CharSequence text = Globals.getInstance().isSavingGames() ? "Game will be recorded!" : "Recording off!";
 		int duration = Toast.LENGTH_SHORT;
 		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();

@@ -1,5 +1,7 @@
 package com.src.android_chess;
 
+import java.io.IOException;
+
 import android.app.Application;
 import android.content.Context;
 import android.widget.Toast;
@@ -13,13 +15,24 @@ import android.widget.Toast;
  */
 
 public class Globals {
-
 	private static Globals instance;
+	private static GameList gameList;
 	private static Square selectedSquare = null;
 	private static boolean selected = false;
+	private static boolean saveGames = false;
+	
 	static {
         instance = new Globals();
+        gameList = GameList.getInstance();
     }
+	
+	/**
+	 * @return The GameList manager responsible for storing saved chess games.
+	 */
+	public GameList getGameList() {
+		return gameList;
+	}
+	
 	public static Globals getInstance() {
     	if(instance == null)
     		instance = new Globals();
@@ -27,13 +40,11 @@ public class Globals {
         return Globals.instance;
     }
 
-    private boolean saveGames = false;
-    
     private Globals() {
     	super();
     }
 
-    public boolean getValue() {
+    public boolean isSavingGames() {
         return this.saveGames;
     }
 
@@ -41,7 +52,7 @@ public class Globals {
     	return selected;
     }
 
-    public void setValue(boolean saveGames) {
+    public void setSavingGames(boolean saveGames) {
         this.saveGames = saveGames;
     }
 
@@ -51,7 +62,7 @@ public class Globals {
 		toast.show();
 	}
     
-    public void toggle() {
+    public void toggleSavingGames() {
         saveGames = !saveGames;
     }
     

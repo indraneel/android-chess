@@ -1,6 +1,8 @@
 package com.src.grid;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.src.pieces.Piece;
 
@@ -16,9 +18,24 @@ public class Chessboard implements Grid<Piece> {
 	/**
 	 * Create a new empty chessboard.
 	 */
-	public Chessboard() {
+	public Chessboard () {
 		super();
 		map = new HashMap<Location, Piece>(32);
+	}
+	
+	public Chessboard (Set<Entry<Location, Piece>> entrySet) {
+		super();
+		map = new HashMap<Location, Piece>(32);
+		for(Entry<Location, Piece> e : entrySet) {
+			map.put(e.getKey().copy(), e.getValue().copy());
+		}
+	}
+	
+	/**
+	 * @return A set containing all of the mappings in the chessboard.
+	 */
+	public Set<Entry<Location, Piece>> getEntrySet() {
+		return map.entrySet();
 	}
 	
 	@Override
@@ -43,7 +60,6 @@ public class Chessboard implements Grid<Piece> {
 		StringBuilder sb = new StringBuilder(200);
 		int rMax = getRows(), cMax = getCols();
 		boolean isWhite = true;
-		// TODO not right
 		for(int row = !inverted ? rMax - 1 : 0, i = 0; i < rMax; i++, row += !inverted ? -1 : 1) {
 			for(int col = inverted ? cMax - 1 : 0, j = 0; j < cMax; j++, col += inverted ? -1 : 1) {
 				Location loc = new Location(row, col);

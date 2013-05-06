@@ -19,6 +19,11 @@ public class Knight extends Piece {
 	}
 	
 	@Override
+	public Piece copy() {
+		return new Knight(isWhite(), getGame(), getLocation().copy());
+	}
+	
+	@Override
 	public char toFEN() {
 		return isWhite() ? 'N' : 'n';
 	}

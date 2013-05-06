@@ -23,9 +23,17 @@ public class Pawn extends Piece {
 		ep = getLocation().getAdjacentLocation(isWhite ? 0 : 180);
 	}
 	
+	private Pawn(boolean isWhite, Game game) {
+		super(isWhite, game, null);
+	}
+	
 	@Override
-	public boolean canMove(Location loc) {
-		return getMoveLocations().contains(loc);
+	public Piece copy() {
+		Pawn p = new Pawn(isWhite(), getGame());
+		p.overrideLocation(getLocation().copy());
+		p.start = start.copy();
+		p.ep = ep.copy();
+		return p;
 	}
 	
 	@Override
@@ -47,6 +55,58 @@ public class Pawn extends Piece {
 			locs.add(l2);
 		}
 		return locs;
+	}
+	
+	@Override
+	public int getValue() {
+		return 1;
+	}
+
+	/**
+	 * @return True if this pawn has already moved; false otherwise. If the
+	 * piece has been captured then the result of this method is undefined.
+	 */
+	public boolean hasMoved() {
+		if(start == null)
+			return false;
+		return !start.equals(getLocation());
+	}
+
+	/**
+	 * Promotes this pawn for reaching the eighth rank.
+	 * @param p The piece to promote to. If this is set to null, the piece is
+	 * assumed to be a queen.
+	 * @throws IllegalArgumentException If the piece to promote to is illegal 
+	 * (must be a minor or major piece).
+	 * @throws IllegalStateException If the pawn is not on its eighth rank.
+	 */
+	public void promote(Piece p) {
+		if(getLocation().getRank() != (isWhite() ? 7 : 0))
+			throw new IllegalStateException("Cannot promote when not on the eighth rank.");
+		
+		if(p == null)
+			p = new Queen(isWhite(), getGame(), getLocation());
+		if(p instanceof King || p instanceof Pawn)
+			throw new IllegalArgumentException
+				("You must promote to a queen, rook, knight, or bishop.");
+		
+		p.setLocation(getLocation());
+		setLocation(null);
+	}
+	
+	@Override
+	public void setLocation(Location loc) {
+		if(loc != null && getLocation() != null) {
+			int delta_y = Math.abs(loc.getRank() - getLocation().getRank());
+			if(delta_y == 2)
+				getGame().setEnPassant(this, ep);
+		}
+		super.setLocation(loc);
+	}
+
+	@Override
+	public char toFEN() {
+		return isWhite() ? 'P' : 'p';
 	}
 	
 	@Override
@@ -81,56 +141,8 @@ public class Pawn extends Piece {
 		}
 		return result;
 	}
-
-	@Override
-	public int getValue() {
-		return 1;
-	}
-
-	/**
-	 * @return True if this pawn has already moved; false otherwise. If the
-	 * piece has been captured then the result of this method is undefined.
-	 */
-	public boolean hasMoved() {
-		if(start == null)
-			return false;
-		return !start.equals(getLocation());
-	}
-
-	@Override
-	public void setLocation(Location loc) {
-		if(loc != null && getLocation() != null) {
-			int delta_y = Math.abs(loc.getRank() - getLocation().getRank());
-			if(delta_y == 2)
-				getGame().setEnPassant(this, ep);
-		}
+	
+	private void overrideLocation(Location loc) {
 		super.setLocation(loc);
-	}
-	
-	/**
-	 * Promotes this pawn for reaching the eighth rank.
-	 * @param p The piece to promote to. If this is set to null, the piece is
-	 * assumed to be a queen.
-	 * @throws IllegalArgumentException If the piece to promote to is illegal 
-	 * (must be a minor or major piece).
-	 * @throws IllegalStateException If the pawn is not on its eighth rank.
-	 */
-	public void promote(Piece p) {
-		if(getLocation().getRank() != (isWhite() ? 7 : 0))
-			throw new IllegalStateException("Cannot promote when not on the eighth rank.");
-		
-		if(p == null)
-			p = new Queen(isWhite(), getGame(), getLocation());
-		if(p instanceof King || p instanceof Pawn)
-			throw new IllegalArgumentException
-				("You must promote to a queen, rook, knight, or bishop.");
-		
-		p.setLocation(getLocation());
-		setLocation(null);
-	}
-	
-	@Override
-	public char toFEN() {
-		return isWhite() ? 'P' : 'p';
 	}
 }

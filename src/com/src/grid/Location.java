@@ -76,9 +76,8 @@ public class Location {
 	
 	@Override
 	public boolean equals(Object o) {
-		if(o == null || !(o instanceof Location)) {
+		if(o == null || !(o instanceof Location))
 			return false;
-		}
 		
 		Location loc = (Location) o;
 		return loc.file == file && loc.rank == rank;
@@ -131,6 +130,13 @@ public class Location {
 	 */
 	public int getRank() {
 		return rank;
+	}
+	
+	/**
+	 * @return A copy of this location.
+	 */
+	public Location copy() {
+		return new Location(rank, file);
 	}
 	
 	@Override

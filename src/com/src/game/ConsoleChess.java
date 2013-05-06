@@ -1,5 +1,8 @@
 package com.src.game;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -59,6 +62,32 @@ public class ConsoleChess {
 				String input = st.nextToken();
 				if(input.equalsIgnoreCase("help"))
 					showHelp();
+				else if(input.equalsIgnoreCase("undo")) {
+					if(!game.canUndo())
+						System.out.println("You can't undo anymore.\n");
+					else {
+						game.undo();
+						printBoard(auto_invert, game);
+					}
+				}
+				else if(input.equalsIgnoreCase("save")) {
+					System.out.print("Enter a title for this game: ");
+					String in = scanner.nextLine();
+					Playback p = game.toPlayback(in);
+					if(p == null)
+						System.out.println("Game is not saving.");
+					else {
+						try {
+							BufferedWriter br = new BufferedWriter(new FileWriter(in + ".txt"));
+							br.write(p.toString());
+							br.close();
+							System.out.println("Saved to " + in + ".txt!");
+						}
+						catch(IOException e) {
+							System.out.println("An error occurred while saving.");
+						}
+					}
+				}
 				else if(input.contains("available-moves")) {
 					int index = input.indexOf('(');
 					String loc = input.substring(index + 1, index + 3);
@@ -78,12 +107,8 @@ public class ConsoleChess {
 					System.out.println(game.toString() + "\n");
 				else if(input.equalsIgnoreCase("toggle-invert")) {
 					auto_invert = !auto_invert;
-					if((!auto_invert && game.getGrid().isInverted()) || 
-						(auto_invert && game.isWhitesTurn() == game.getGrid().isInverted())) {
-						game.getGrid().invert();
-					}
 					System.out.println("Auto-invert is now set to " + (auto_invert ? "on." : "off."));
-					System.out.print("\n" + game.getGrid() + "\n\n");
+					printBoard(auto_invert, game);
 				}
 				else if(input.equalsIgnoreCase("draw") || input.equalsIgnoreCase("draws")) {
 					if(draw_offered) {
@@ -212,9 +237,7 @@ public class ConsoleChess {
 				continue;
 			}
 			
-			if(auto_invert)
-				game.getGrid().invert();
-			System.out.println("\n" + game.getGrid() + "\n");
+			printBoard(auto_invert, game);
 		}
 		while(true);
 		
@@ -226,12 +249,21 @@ public class ConsoleChess {
 			System.out.println("It's a draw!\n1/2-1/2");
 	}
 	
+	private static void printBoard(boolean auto_invert, Game g) {
+		if(!auto_invert && g.getGrid().isInverted())
+			g.getGrid().invert();
+		else if(g.getGrid().isInverted() == g.isWhitesTurn())
+			g.getGrid().invert();
+		System.out.println("\n" + g.getGrid() + "\n");
+	}
+	
 	private static void showHelp() {
-		StringBuilder sb = new StringBuilder(550);
+		StringBuilder sb = new StringBuilder(700);
 		sb.append("# Movement #\n");
 		sb.append("To move a piece, type the piece's current square, then its destination.\n");
 		sb.append("For example, the move 1. e4 would be 'e2 e4'.\n");
 		sb.append("Type 'show-moves' to list all moves that have been played.");
+		sb.append("Type 'undo' to undo the last move.");
 		sb.append('\n');
 		sb.append("# Draw #\n");
 		sb.append("To offer a draw, move a piece and append 'draw?'.\n");

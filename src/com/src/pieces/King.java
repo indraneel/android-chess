@@ -28,6 +28,13 @@ public class King extends Piece {
 		return isWhite() ? 'K' : 'k';
 	}
 	
+	@Override
+	public Piece copy() {
+		King k = new King(isWhite(), getGame(), getLocation().copy());
+		k.start = start;
+		return k;
+	}
+	
 	/**
 	 * @param r Either the kingside or queenside rook.
 	 * @return True if this king can castle with the rook; false otherwise.

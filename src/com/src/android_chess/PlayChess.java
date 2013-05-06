@@ -1,12 +1,14 @@
 package com.src.android_chess;
 
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
@@ -364,22 +366,49 @@ public class PlayChess extends Activity {
 	}
 	
 	*/
+	
+	/**
+	 * Offers a draw.
+	 */
 	public void draw(){
-		
+		// TODO Dialog yes/no box
 	}
 	
-	public void ai(){
-		
+	/**
+	 * Attempts to make a move on behalf of the current player.
+	 */
+	public void ai() {
+		try {
+			game.makeAutomaticMove();
+		}
+		catch(NoSuchElementException e) {
+			Toast.makeText(this, "The computer has no moves for you.", Toast.LENGTH_SHORT).show();
+		}
 	}
 
-	public void resign(){
-	
+	/**
+	 * Resigns from the game.
+	 */
+	public void resign() {
+		boolean white = game.isWhitesTurn();
+		Toast.makeText(this, white ? "White resigned!" : "Black resigned!", Toast.LENGTH_SHORT).show();
+		if(Globals.getInstance().isSavingGames()) {
+			
+		}
 	}
 
-	public void undo(){
-	
+	/**
+	 * Takes back the last move, if possible.
+	 */
+	public void undo() {
+		if(game.canUndo()) {
+			game.undo();
+			Toast.makeText(this, "Last move taken back. It's " + 
+					(game.isWhitesTurn() ? "white's" : "black's") + " turn.", Toast.LENGTH_SHORT).show();
+		}
+		else
+			Toast.makeText(this, "You cannot take back any more moves.", Toast.LENGTH_SHORT).show();
 	}
-	
 	
 	public void playGame(View view){
 		System.out.println("Play game!");

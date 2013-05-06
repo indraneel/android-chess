@@ -1,6 +1,7 @@
 package com.src.move;
 
 import com.src.grid.Location;
+import com.src.pieces.Piece;
 
 /**
  * Represents a move on a chessboard.
@@ -67,6 +68,17 @@ public class Move {
 			this.desc = desc;
 		}
 		
+		/**
+		 * @return A description of this special move.
+		 */
+		public String getDescription() {
+			return desc;
+		}
+		
+		/**
+		 * @param c A character.
+		 * @return Converts the character to a corresponding piece promotion.
+		 */
 		public static Special parseChar(char c) {
 			switch(Character.toLowerCase(c)) {
 				case 'q':
@@ -132,6 +144,22 @@ public class Move {
 		this.special = spec;
 	}
 	
+	/**
+	 * @return True if this move is a castling move; false otherwise.
+	 */
+	public boolean isCastle() {
+		return special == Special.KINGSIDE_CASTLE ||
+				special == Special.QUEENSIDE_CASTLE;
+	}
+	
+	/**
+	 * @return True if this move is a promotion move; false otherwise.
+	 */
+	public boolean isPromotion() {
+		return special == Special.QUEEN || special == Special.BISHOP ||
+				special == Special.ROOK || special == Special.KNIGHT;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if(o == null || !(o instanceof Move))
@@ -147,14 +175,25 @@ public class Move {
 	public Location getDestination() {
 		return dest;
 	}
-	
+
 	/**
 	 * @return The source location.
 	 */
 	public Location getSource() {
 		return src;
 	}
-	
+
+	/**
+	 * @return A special field indicating the type of move.
+	 */
+	public Special getSpecial() {
+    	return special;
+    }
+
+	public void setSpecial(Special special) {
+    	this.special = special;
+    }
+
 	@Override
 	public String toString() {
 		String str =  getSource() + "-" + getDestination();
@@ -165,18 +204,18 @@ public class Move {
 			case ROOK:
 				str += "=" + special.desc;
 				break;
-			case KINGSIDE_CASTLE:
-			case QUEENSIDE_CASTLE:
-				return special.desc;
-			case EN_PASSANT:
-				str += " " + special.desc;
-				break;
-			case CHECK:
-			case CHECKMATE:
-				str += special.desc;
+//			case KINGSIDE_CASTLE:
+//			case QUEENSIDE_CASTLE:
+//				return special.desc;
+//			case EN_PASSANT:
+//				str += " " + special.desc;
+//				break;
+//			case CHECK:
+//			case CHECKMATE:
+//				str += special.desc;
 			default:
 				break;
 		}
 		return str;
 	}
-}
+} 

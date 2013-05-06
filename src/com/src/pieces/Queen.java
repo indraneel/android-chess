@@ -19,6 +19,11 @@ public class Queen extends Piece {
 	}
 	
 	@Override
+	public Piece copy() {
+		return new Queen(isWhite(), getGame(), getLocation().copy());
+	}
+	
+	@Override
 	public char toFEN() {
 		return isWhite() ? 'Q' : 'q';
 	}

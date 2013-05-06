@@ -1,6 +1,8 @@
 package com.src.move;
 
 import java.io.Serializable;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 /**
  * Represents a linked list of moves. Allows one user to iterate both forwards
@@ -9,7 +11,7 @@ import java.io.Serializable;
  */
 public class MoveSequence implements Serializable {
 	/**
-	 * A standard bidirectional linked list node.
+	 * A bidirectional linked list node.
 	 * @author Kyle
 	 * @param <T> The type of data to store.
 	 */
@@ -34,7 +36,7 @@ public class MoveSequence implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private Node<Move> head, current, last;
+	private Node<Move> head, last, current;
 	
 	/**
 	 * Creates a new empty move sequence.
@@ -43,6 +45,7 @@ public class MoveSequence implements Serializable {
 		super();
 		this.head = null;
 		this.current = null;
+		this.last = null;
 	}
 	
 	/**
@@ -51,7 +54,9 @@ public class MoveSequence implements Serializable {
 	public void append(Move m) {
 		if(head == null) {
 			head = new Node<Move>(m);
+			head.prev = null;
 			last = head;
+			current = head;
 		}
 		else {
 			last.next = new Node<Move>(m);
@@ -62,12 +67,33 @@ public class MoveSequence implements Serializable {
 	}
 	
 	/**
+	 * Deletes the last move in the sequence.
+	 * @throws NoSuchElementException if there are no moves to remove.
+	 */
+	public void delete() {
+		if(isEmpty())
+			throw new NoSuchElementException("Sequence is empty.");
+		
+		if(last == head) {
+			head = null;
+			last = null;
+			current = null;
+		}
+		else {
+			if(current == last)
+				current = last.prev;
+			last = last.prev;
+			last.next = null;
+		}
+	}
+	
+	/**
 	 * @return The current move in the iteration. If the sequence has no moves
 	 * or the iteration has reached the end, this method returns
 	 * <code>null</code>.
 	 */
 	public Move currentMove() {
-		return current.data;
+		return current == null ? null : current.data;
 	}
 	
 	/**
@@ -78,24 +104,11 @@ public class MoveSequence implements Serializable {
 	}
 	
 	/**
-	 * @return True if there is a move currently in the iteration.
+	 * @return True if there is a move before this move in the sequence; false
+	 * otherwise.
 	 */
-	public boolean has() {
-		return current != null;
-	}
-	
-	/**
-	 * Moves the iteration backwards to the previous move in the sequence.
-	 * @return The last move played, or <code>null</code> if at the beginning
-	 * of the sequence.
-	 */
-	public Move lastMove() {
-		if(current == head || current == null)
-			return null;
-		
-		Node<Move> node = current;
-		current = current.prev;
-		return node.data;
+	public boolean hasPrevious() {
+		return current != null && current.prev != null;
 	}
 	
 	/**
@@ -107,17 +120,25 @@ public class MoveSequence implements Serializable {
 	}
 	
 	/**
+	 * Moves the iteration backwards to the previous move in the sequence.
+	 */
+	public void lastMove() {
+		if(current == null)
+			current = last;
+		else
+			current = current.prev;
+	}
+	
+	/**
 	 * Moves the iteration forward to the next move in the sequence.
 	 * @return The next move played, or <code>null</code> if at the end of the
 	 * sequence.
 	 */
-	public Move nextMove() {
+	public void nextMove() {
 		if(current == null)
-			return null;
+			return;
 		
-		Node<Move> node = current;
 		current = current.next;
-		return node.data;
 	}
 	
 	/**
@@ -125,5 +146,43 @@ public class MoveSequence implements Serializable {
 	 */
 	public void reset() {
 		current = head;
+	}
+	
+	/**
+	 * A sequence of moves in extended notation, or the empty string if no
+	 * moves are in the sequence.
+	 */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		Node<Move> node = head;
+		while(node != null) {
+			sb.append(node.data.toString());
+			sb.append('|');
+			node = node.next;
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Creates a MoveSequence from a properly-formatted String.
+	 * @param str The String to convert, in the format of the toString()
+	 * method of this class.
+	 * @return A new move sequence.
+	 */
+	public static MoveSequence fromString(String str) {
+		StringTokenizer st = new StringTokenizer(str, "|");
+		MoveSequence ms = new MoveSequence();
+		
+		while(st.hasMoreTokens()) {
+			String tok = st.nextToken();
+			int pos = tok.indexOf('-');
+			Move m = new Move(tok.substring(0, pos), tok.substring(pos + 1));
+			pos = tok.indexOf('=');
+			if(pos != -1)
+				m.setSpecial(Move.Special.parseChar(tok.charAt(pos + 1)));
+			ms.append(m);
+		}
+		return ms;
 	}
 }

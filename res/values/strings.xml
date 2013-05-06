@@ -11,5 +11,6 @@
     <string name="resign">Resign</string>
     <string name="undo">Undo</string>
     <string name="ai">AI</string>
+    <string name="title_activity_select_game">SelectGame</string>
 
 </resources>
