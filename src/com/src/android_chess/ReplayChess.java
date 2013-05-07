@@ -33,6 +33,7 @@ public class ReplayChess extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		System.out.println("Creating replay");
 		super.onCreate(savedInstanceState);
 		mDisplay = this.getWindowManager().getDefaultDisplay();
 		displayHeight = mDisplay.getHeight();

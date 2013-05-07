@@ -1,12 +1,11 @@
 package com.src.android_chess;
 
-import java.io.IOException;
+import java.util.ArrayList;
 
-import com.src.game.Playback;
-
-import android.app.Application;
 import android.content.Context;
 import android.widget.Toast;
+
+import com.src.game.Playback;
 
 /**
  * Singleton class that represents a global variable that controls the 
@@ -17,6 +16,15 @@ import android.widget.Toast;
  */
 
 public class Globals {
+	private static ArrayList<Playback> savedGames;
+	public static ArrayList<Playback> getSavedGames() {
+    	return savedGames;
+    }
+
+	public static void setSavedGames(ArrayList<Playback> savedGames) {
+    	Globals.savedGames = savedGames;
+    }
+
 	private static Globals instance;
 	private static GameList gameList;
 	private static Square selectedSquare = null;
@@ -28,7 +36,7 @@ public class Globals {
 	
 	static {
         instance = new Globals();
-        gameList = GameList.getInstance();
+        savedGames = new ArrayList<Playback>();
     }
 	
 	private Globals() {
@@ -38,7 +46,7 @@ public class Globals {
 	/**
 	 * @return The GameList manager responsible for storing saved chess games.
 	 */
-	public GameList getGameList() {
+	public static GameList getGameList() {
 		return gameList;
 	}
 

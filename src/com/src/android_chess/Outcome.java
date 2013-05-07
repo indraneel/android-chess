@@ -17,25 +17,25 @@ public class Outcome extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.outcome);
-		linearLayout = (LinearLayout) findViewById(R.layout.outcome);
-		linearLayout.addView(save);
-		linearLayout.addView(quit);
-		save.setText("Save Game");
-		save.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-			}
-		});
-		quit.setText("Quit");
-		quit.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getBaseContext(), Start.class);
-				startActivity(intent);
-			}
-		});
+//		linearLayout = (LinearLayout) findViewById(R.layout.outcome);
+//		linearLayout.addView(save);
+//		linearLayout.addView(quit);
+//		save.setText("Save Game");
+//		save.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				
+//			}
+//		});
+//		quit.setText("Quit");
+//		quit.setOnClickListener(new View.OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				Intent intent = new Intent(getBaseContext(), Start.class);
+//				startActivity(intent);
+//			}
+//		});
 		
 	}
 

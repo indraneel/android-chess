@@ -1,12 +1,10 @@
 package com.src.android_chess;
 
-import java.io.IOException;
+import java.util.ArrayList;
 
-import com.src.game.Playback;
-
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,7 +12,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
+
+import com.src.game.Playback;
 
 public class SelectReplay extends Activity {
 	private GameList gameList;
@@ -25,20 +24,10 @@ public class SelectReplay extends Activity {
 	private SimpleAdapter mSchedule;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		System.out.println("Creating selection list");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_select_game);
 		
-		gameList = Globals.getInstance().getGameList();
-		// Load the games list.
-		try {
-	        gameList.load();
-        }
-        catch (IOException e) {
-	        Toast.makeText(this, "An error occured while loading the saved games list.", Toast.LENGTH_SHORT).show();
-        }
-		catch(Exception ex) {
-			ex.printStackTrace(System.out);
-		}
 		linearLayout = (LinearLayout) findViewById(R.id.gamelistlayout);
 		listView = new ListView(getApplicationContext());
 		linearLayout.addView(listView);
@@ -51,8 +40,10 @@ public class SelectReplay extends Activity {
 	 * This populates the ListView from the GameList 
 	 */
 	private void populateList() {
-		for(int i = 0; i < gameList.getGames().size(); i++) {
-			Playback p = gameList.getGames().get(i);
+		System.out.println("Populating");
+		ArrayList<Playback> games = Globals.getSavedGames();
+		for(int i = 0; i < games.size(); i++) {
+			Playback p = games.get(i);
 			Button b = new Button(this);
 			b.setText(p.getTitle() + " - " + p.getDate());
 			b.setTag(p);
@@ -64,7 +55,7 @@ public class SelectReplay extends Activity {
 	                startActivity(intent);
                 }
 			});
-			listView.addView(b, i);
+			listView.addView(b);
 		}
 	}
 
@@ -80,7 +71,9 @@ public class SelectReplay extends Activity {
 		listButton = (Button) findViewById(R.id.gamelistbtn);
 		listButton.setText(sortByTitle ? "Sort by Title" : "Sort by Date");
 		listView.removeAllViewsInLayout();
-		gameList.toggleSorting();
+		listView.invalidate();
+		listView.refreshDrawableState();
+		// TODO
 		populateList();
 	}
 }
