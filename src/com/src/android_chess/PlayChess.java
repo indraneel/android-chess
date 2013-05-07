@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Display;
@@ -501,6 +502,8 @@ public class PlayChess extends Activity {
 	 */
 	public void resign() {
 		boolean white = game.isWhitesTurn();
+
+	
 		// TODO new view to report result
 	}
 
