@@ -527,7 +527,7 @@ public class PlayChess extends Activity {
 	    new AlertDialog.Builder(this)
 	        .setIcon(android.R.drawable.ic_dialog_alert)
 	        .setTitle("Closing Activity")
-	        .setMessage("Are you sure you want to close this activity?")
+	        .setMessage("Are you sure you want to quit this game? The game will not be saved.")
 	        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
 	    {
 	        @Override

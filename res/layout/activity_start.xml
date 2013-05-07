@@ -14,7 +14,7 @@
         android:layout_width="fill_parent"
 		android:layout_weight="1"
         android:onClick="playGame" />
-    <ToggleButton
+<!--     <ToggleButton
         android:textOff="Enable Game Recording"
         android:textOn="Disable Game Recording"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
 		android:layout_width="fill_parent"
 		android:layout_weight="1"
 		android:onClick="setRecord" />
-    <Button
+ -->    <Button
         android:layout_height="wrap_content"
         android:text="@string/game_playback" 
 		android:layout_width="fill_parent"
