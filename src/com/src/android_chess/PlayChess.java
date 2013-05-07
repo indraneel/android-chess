@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
@@ -32,6 +35,7 @@ public class PlayChess extends Activity {
 	private TableRow tr;
 	private Display mDisplay;
 	private int displayHeight, displayWidth;
+	private Button ai, undo, resign, draw;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,50 @@ public class PlayChess extends Activity {
 	     table.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 	     table.setStretchAllColumns(true);
 	     table.setOrientation(LinearLayout.VERTICAL);
+	     ai = new Button(this);
+	     undo = new Button(this);
+	     resign = new Button(this);
+	     draw = new Button(this);
+	     linearLayout.addView(ai);
+	     linearLayout.addView(undo);
+	     linearLayout.addView(resign);
+	     linearLayout.addView(draw);
+	     ai.setText("AI");
+	     ai.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				ai();
+			}
+		});
+	     undo.setText("Undo");
+	     undo.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				undo();
+			}
+		});
+	     resign.setText("Resign");
+	     resign.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				resign();
+			}
+		});
+	     draw.setText("Draw");
+	     draw.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				draw();
+			}
+		});
+	     
+	     
+	     
 	     setupBoard();
 	     
 	     //this is 1-8
@@ -467,10 +515,29 @@ public class PlayChess extends Activity {
 		}
 		else
 			Toast.makeText(this, "You cannot take back any more moves.", Toast.LENGTH_SHORT).show();
+		renderBoard();
 	}
 	
 	public void playGame(View view){
 		System.out.println("Play game!");
 	}
 
+	@Override
+	public void onBackPressed() {
+	    new AlertDialog.Builder(this)
+	        .setIcon(android.R.drawable.ic_dialog_alert)
+	        .setTitle("Closing Activity")
+	        .setMessage("Are you sure you want to close this activity?")
+	        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+	    {
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	            finish();    
+	        }
+
+	    })
+	    .setNegativeButton("No", null)
+	    .show();
+	}
+	
 }
