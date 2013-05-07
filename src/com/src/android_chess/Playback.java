@@ -1,24 +1,22 @@
 package com.src.android_chess;
 
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-
+import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.Toast;
 
 import com.src.game.Game;
 import com.src.grid.Chessboard;
 import com.src.grid.Location;
-import com.src.move.IllegalMoveException;
 import com.src.pieces.Piece;
 
 public class Playback extends Activity {
@@ -32,6 +30,7 @@ public class Playback extends Activity {
 	private TableRow tr;
 	private Display mDisplay;
 	private int displayHeight, displayWidth;
+	private Button next, previous;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +41,14 @@ public class Playback extends Activity {
 		setContentView(R.layout.playback);
 		generateBoard();
 		game = new Game(new Chessboard());
+		
+
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.gamemenu, menu);
+		getMenuInflater().inflate(R.menu.playbackmenu, menu);
 		return true;
 	}
 	
@@ -149,6 +150,31 @@ public class Playback extends Activity {
              }
 
          }
+         next = new Button(this);
+         previous = new Button(this);
+         linearLayout.addView(next);
+         linearLayout.addView(previous);
+         next.setText("Next");
+         next.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				next();
+			}
+		});
+         
+         previous.setText("Previous");
+         previous.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				previous();
+			}
+		});
+	     next.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+	     previous.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
          setContentView(linearLayout);
          return;
 	}

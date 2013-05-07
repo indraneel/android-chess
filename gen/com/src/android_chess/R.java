@@ -67,7 +67,9 @@ public final class R {
         public static final int draw=0x7f050006;
         public static final int game_playback=0x7f050005;
         public static final int hello_world=0x7f050002;
+        public static final int next=0x7f05000b;
         public static final int play_chess=0x7f050003;
+        public static final int previous=0x7f05000c;
         public static final int record_game=0x7f050004;
         public static final int resign=0x7f050007;
         public static final int title_activity_select_game=0x7f05000a;
