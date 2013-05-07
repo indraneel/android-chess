@@ -117,7 +117,6 @@ public class GameList {
 			PrintWriter pw = new PrintWriter(fs);
 			pw.print("");
 			pw.close();
-			fs.close();
 		}
 	}
 	

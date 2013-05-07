@@ -1,11 +1,9 @@
 package com.src.android_chess;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.src.game.Playback;
+import java.io.IOException;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -14,7 +12,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import com.src.game.Playback;
 
 public class SelectGame extends Activity {
 
@@ -31,12 +31,12 @@ public class SelectGame extends Activity {
 		
 		gameList = Globals.getInstance().getGameList();
 		// Load the games list.
-//		try {
-//	        gameList.load();
-//        }
-//        catch (IOException e) {
-//	        Toast.makeText(this, "An error occured while loading the saved games list.", Toast.LENGTH_SHORT).show();
-//        }
+		try {
+	        gameList.load();
+        }
+        catch (IOException e) {
+	        Toast.makeText(this, "An error occured while loading the saved games list.", Toast.LENGTH_SHORT).show();
+        }
 		linearLayout = (LinearLayout) findViewById(R.id.gamelistlayout);
 		listView = new ListView(getApplicationContext());
 		linearLayout.addView(listView);
@@ -49,15 +49,20 @@ public class SelectGame extends Activity {
 	 * This populates the ListView from the GameList 
 	 */
 	private void populateList() {
-		for(Playback p : gameList.getGames()) {
+		for(int i = 0; i < gameList.getGames().size(); i++) {
+			Playback p = gameList.getGames().get(i);
 			Button b = new Button(this);
 			b.setText(p.getTitle() + " - " + p.getDate());
+			b.setTag(p);
 			b.setOnClickListener(new OnClickListener() {
 				@Override
                 public void onClick(View v) {
-	                
+	                Globals.setPlayback((Playback) v.getTag());
+	                Intent intent = new Intent(getBaseContext(), ReplayChess.class);
+	                startActivity(intent);
                 }
 			});
+			listView.addView(b, i);
 		}
 	}
 
@@ -72,27 +77,8 @@ public class SelectGame extends Activity {
 		sortByTitle = !sortByTitle;
 		listButton = (Button) findViewById(R.id.gamelistbtn);
 		listButton.setText(sortByTitle ? "Sort by Title" : "Sort by Date");
-		//sort by date
-		if (listButton.getText().equals("Sort by Date")) {
-			sortByDate();
-		}
-		//sort by text
-		else {
-			sortByTitle();
-		}
-	}
-	
-	/*
-	 * Sorts list by date
-	 */
-	private void sortByDate(){
-		
-	}
-	
-	/*
-	 * Sorts list by title
-	 */
-	private void sortByTitle(){
-		
+		listView.removeAllViewsInLayout();
+		gameList.toggleSorting();
+		populateList();
 	}
 }

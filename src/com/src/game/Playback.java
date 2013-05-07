@@ -77,7 +77,7 @@ public class Playback implements Serializable {
 	 * Begins playback of this game.
 	 */
 	public void startPlayback() {
-		game = new Game(new Chessboard(), false);
+		game = new Game(new Chessboard());
 		moves.reset();
 		count = 0;
 		boards.clear();

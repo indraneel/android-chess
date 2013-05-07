@@ -48,7 +48,7 @@ public class Start extends Activity {
 	}
 	
 	public void playback(View view){
-		Intent intent = new Intent(this, ReplayChess.class);
+		Intent intent = new Intent(this, SelectGame.class);
 		startActivity(intent);
 	}
 
