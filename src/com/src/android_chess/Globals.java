@@ -23,6 +23,8 @@ public class Globals {
 	private static Playback playback;
 	private static boolean selected = false;
 	private static boolean saveGames = false;
+	private static boolean whiteWinner;
+	private static boolean draw;
 	
 	static {
         instance = new Globals();
@@ -40,6 +42,18 @@ public class Globals {
 		return gameList;
 	}
 
+	public void setWhiteWinner(){
+		this.whiteWinner = true;
+	}
+	
+	public void setBlackWinner(){
+		this.whiteWinner = false;
+	}
+	
+	public void setDraw(){
+		this.draw = true;
+	}
+	
     public boolean isSavingGames() {
         return this.saveGames;
     }

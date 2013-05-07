@@ -484,6 +484,28 @@ public class PlayChess extends Activity {
 	 */
 	public void draw(){
 		// TODO Dialog yes/no box
+
+		boolean white = game.isWhitesTurn();
+		final Context temp = this;
+
+	    new AlertDialog.Builder(this)
+	        .setIcon(android.R.drawable.ic_dialog_alert)
+	        .setTitle("Draw!")
+	        .setMessage("Are you sure this game is a draw?")
+	        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+	    {
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	        	Intent intent = new Intent(temp, Outcome.class);
+	    		startActivity(intent);   
+	        }
+
+	    })
+	    .setNegativeButton("No", null)
+	    .show();
+		
+		// TODO new view to report result
+	
 	}
 	
 	/**
@@ -509,7 +531,7 @@ public class PlayChess extends Activity {
 	    new AlertDialog.Builder(this)
 	        .setIcon(android.R.drawable.ic_dialog_alert)
 	        .setTitle("Resign")
-	        .setMessage("Are you sure you want to resign?" + (white ? "Black" : "White" ) + " will win.")
+	        .setMessage("Are you sure you want to resign? " + (white ? "Black" : "White" ) + " will win.")
 	        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
 	    {
 	        @Override
