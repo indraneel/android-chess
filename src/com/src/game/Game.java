@@ -32,7 +32,6 @@ public class Game {
 	private HashSet<Location> white_locs, black_locs;
 	
 	// Move and turn information
-	private boolean isRecording;
 	private MoveSequence moves;
 	private boolean whiteTurn;
 	
@@ -51,26 +50,15 @@ public class Game {
 	private HashSet<Move> escape_moves;
 	
 	/**
-	 * Create a new game on the given board. Moves will automatically be
-	 * recorded.
+	 * Creates a new game on the given board.
 	 * @param grid The board on which the game will be played.
 	 */
 	public Game(Chessboard grid) {
-		this(grid, true);
-	}
-	
-	/**
-	 * Creates a new game on the given board.
-	 * @param grid The board on which the game will be played.
-	 * @param recordable True if games should be recorded; false otherwise.
-	 */
-	public Game(Chessboard grid, boolean recordable) {
 		super();
 		this.grid = grid;
 		this.black_locs = new HashSet<Location>(32);
 		this.white_locs = new HashSet<Location>(32);
 		this.whiteTurn = true;
-		this.isRecording = recordable;
 		this.moves = new MoveSequence();
 		this.canUndo = false;
 		defaultPosition();
@@ -154,7 +142,8 @@ public class Game {
 	 */
 	public void makeAutomaticMove() {
 		ArrayList<Move> moves = new ArrayList<Move>();
-		for(Piece p : this.pieces) {
+		for(Entry<Location, Piece> e : grid.getEntrySet()) {
+			Piece p = e.getValue();
 			if(isWhitesTurn() != p.isWhite())
 				continue;
 			
@@ -181,6 +170,8 @@ public class Game {
 	 * @throws IllegalMoveException If the attempted move is not valid.
 	 */
 	public boolean move(Location src, Location dest) throws InvalidLocationException, IllegalMoveException {
+		System.out.println("[Move] Start.");
+		
 		if(!grid.isValid(src))
 			throw new InvalidLocationException(src);
 		if(!grid.isValid(dest))
@@ -192,6 +183,7 @@ public class Game {
 			return move(src, dest, 'Q');
 		}
 		if(p instanceof King && !p.getAttackedLocations().contains(dest)) {
+			System.out.println("[Move] Castling attempt?");
 			// Let's see if a castle is attempted.
 			King k = (King) p;
 			Rook r;
@@ -211,7 +203,7 @@ public class Game {
 
 			r = (Rook) temp;
 			if(!k.canCastle(r)) {
-				System.out.println("Castling move is illegal.");
+				System.out.println("[Move] Castling move is illegal.");
 				throw new IllegalMoveException("That castling move is not allowed.", p, dest);
 			}
 			
@@ -236,10 +228,10 @@ public class Game {
 			Move.Special spec = (dest.getFile() == 2 ? Move.Special.QUEENSIDE_CASTLE
 					: Move.Special.KINGSIDE_CASTLE);
 			
-			if(isRecording)
-				moves.append(new Move(src, dest, spec));
+			moves.append(new Move(src, dest, spec));
 		}
 		else {
+			System.out.println("[Move] Standard Move");
 			if(!p.canMove(dest))
 				throw new IllegalMoveException(p, dest);
 			Move m = new Move(src, dest);
@@ -295,8 +287,7 @@ public class Game {
 			}
 		
 			// Adding to the moves list.
-			if(isRecording)
-				moves.append(move);
+			moves.append(move);
 		}
 		
 		
@@ -383,8 +374,7 @@ public class Game {
 		canUndo = true;
 		
 		// Adding to the moves list.
-		if(isRecording)
-			moves.append(new Move(src, dest, Move.Special.parseChar(promotion)));
+		moves.append(new Move(src, dest, Move.Special.parseChar(promotion)));
 		
 		boolean inCheck = isInCheck();
 		for(Piece piece : pieces)
@@ -417,14 +407,10 @@ public class Game {
 	/**
 	 * Saves this game in a format that can be played again.
 	 * @param title A name for this game.
-	 * @return An object that can replay the game, or <code>null</code> if the
-	 * game is not recording.
+	 * @return An object that can replay the game.
 	 */
 	public Playback toPlayback(String title) {
-		if(!isRecording)
-			return null;
-		else
-			return new Playback(moves, title);
+		return new Playback(moves, title);
 	}
 	
 	/**

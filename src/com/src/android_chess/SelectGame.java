@@ -3,10 +3,13 @@ package com.src.android_chess;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.src.game.Playback;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -42,10 +45,20 @@ public class SelectGame extends Activity {
 		
 	}
 
-	/*
+	/**
 	 * This populates the ListView from the GameList 
 	 */
 	private void populateList() {
+		for(Playback p : gameList.getGames()) {
+			Button b = new Button(this);
+			b.setText(p.getTitle() + " - " + p.getDate());
+			b.setOnClickListener(new OnClickListener() {
+				@Override
+                public void onClick(View v) {
+	                
+                }
+			});
+		}
 	}
 
 	@Override
