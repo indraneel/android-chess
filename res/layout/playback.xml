@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:orientation="vertical" xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chessboard"
@@ -9,12 +10,5 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".Start" >
     
-    <!-- <Button
-        android:layout_height="wrap_content"
-        android:text="@string/play_chess"
-        android:layout_width="fill_parent"
-		android:layout_weight="1"
-        android:onClick="playGame" />
-     -->
     
 </LinearLayout>

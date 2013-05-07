@@ -30,6 +30,15 @@
                 <action android:name="com.src.android_chess.ChessBoard" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="com.src.android_chess.Playback"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="com.src.android_chess.playback" />
+            </intent-filter>
+        </activity>
+        
         <activity
             android:name="com.src.android_chess.SelectGame"
             android:label="@string/title_activity_select_game" >

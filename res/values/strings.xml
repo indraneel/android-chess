@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Android Chess</string>
+    <string name="app_name">CHESS by Kyle and Indraneel</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="play_chess">Play Chess!</string>
@@ -12,5 +12,6 @@
     <string name="undo">Undo</string>
     <string name="ai">AI</string>
     <string name="title_activity_select_game">SelectGame</string>
-
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
 </resources>
