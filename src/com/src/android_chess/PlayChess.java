@@ -492,6 +492,7 @@ public class PlayChess extends Activity {
 	public void ai() {
 		try {
 			game.makeAutomaticMove();
+			renderBoard();
 		}
 		catch(NoSuchElementException e) {
 			Toast.makeText(this, "The computer has no moves for you.", Toast.LENGTH_SHORT).show();
