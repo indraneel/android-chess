@@ -496,6 +496,7 @@ public class PlayChess extends Activity {
 	    {
 	        @Override
 	        public void onClick(DialogInterface dialog, int which) {
+	        	Globals.getInstance().setDraw();
 	        	Intent intent = new Intent(temp, Outcome.class);
 	    		startActivity(intent);   
 	        }
@@ -525,7 +526,7 @@ public class PlayChess extends Activity {
 	 * Resigns from the game.
 	 */
 	public void resign() {
-		boolean white = game.isWhitesTurn();
+		final boolean white = game.isWhitesTurn();
 		final Context temp = this;
 
 	    new AlertDialog.Builder(this)
@@ -536,6 +537,12 @@ public class PlayChess extends Activity {
 	    {
 	        @Override
 	        public void onClick(DialogInterface dialog, int which) {
+	        	if (white) { 
+	        		Globals.getInstance().setBlackWinner();
+	        	}
+	        	else {
+	        		Globals.getInstance().setWhiteWinner();
+	        	}
 	        	Intent intent = new Intent(temp, Outcome.class);
 	    		startActivity(intent);   
 	        }
