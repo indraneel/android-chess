@@ -1,11 +1,9 @@
 package com.src.android_chess;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -13,8 +11,10 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.Toast;
 
 import com.src.game.Game;
+import com.src.game.Playback;
 import com.src.grid.Chessboard;
 import com.src.grid.Location;
 import com.src.pieces.Piece;
@@ -22,8 +22,6 @@ import com.src.pieces.Piece;
 public class ReplayChess extends Activity {
 
 	private Square[][] squares = new Square[8][8];
-	private Square selected;
-	private Location selectedLocation;
 	private Game game;
 	private LinearLayout linearLayout;
 	private TableLayout table;
@@ -31,18 +29,17 @@ public class ReplayChess extends Activity {
 	private Display mDisplay;
 	private int displayHeight, displayWidth;
 	private Button next, previous;
+	private Playback playback;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO reverting to sideways view calls onCreate and restarts
 		super.onCreate(savedInstanceState);
 		mDisplay = this.getWindowManager().getDefaultDisplay();
 		displayHeight = mDisplay.getHeight();
 		setContentView(R.layout.playback);
 		generateBoard();
 		game = new Game(new Chessboard());
-		
-
+		playback = Globals.getPlayback();
 	}
 
 	@Override
@@ -156,10 +153,8 @@ public class ReplayChess extends Activity {
          linearLayout.addView(previous);
          next.setText("Next");
          next.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				next();
 			}
 		});
@@ -169,7 +164,6 @@ public class ReplayChess extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				previous();
 			}
 		});
@@ -198,7 +192,13 @@ public class ReplayChess extends Activity {
 	 * and calls renderboard();
 	 */
 	public void next(){
-		
+		if(playback.hasNext()) {
+			playback.next();
+			renderBoard();
+		}
+		else
+			Toast.makeText(this, "There are no more moves forward in the playback.",
+					Toast.LENGTH_LONG).show();
 	}
 	
 	/*
@@ -206,7 +206,13 @@ public class ReplayChess extends Activity {
 	 * and calls renderboard();
 	 */
 	public void previous(){
-		
+		if (playback.hasPrevious()) {
+			playback.previous();
+			renderBoard();
+		}
+		else
+			Toast.makeText(this, "There are no more moves backward in the playback.", 
+					Toast.LENGTH_LONG).show();
 	}
 	
 	

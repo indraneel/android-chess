@@ -70,6 +70,9 @@ public class ConsoleChess {
 						printBoard(auto_invert, game);
 					}
 				}
+				else if(input.equalsIgnoreCase("auto")) {
+					game.makeAutomaticMove();
+				}
 				else if(input.equalsIgnoreCase("save")) {
 					System.out.print("Enter a title for this game: ");
 					String in = scanner.nextLine();
