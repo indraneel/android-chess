@@ -54,6 +54,10 @@ public class Globals {
 		this.draw = true;
 	}
 	
+	public void endDraw(){
+		this.draw = false;
+	}
+	
     public boolean isSavingGames() {
         return this.saveGames;
     }
