@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -502,8 +503,24 @@ public class PlayChess extends Activity {
 	 */
 	public void resign() {
 		boolean white = game.isWhitesTurn();
+		final Context temp = this;
 
-	
+	    new AlertDialog.Builder(this)
+	        .setIcon(android.R.drawable.ic_dialog_alert)
+	        .setTitle("Resign")
+	        .setMessage("Are you sure you want to resign?" + (white ? "Black" : "White" ) + " will win.")
+	        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+	    {
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	        	Intent intent = new Intent(temp, Outcome.class);
+	    		startActivity(intent);   
+	        }
+
+	    })
+	    .setNegativeButton("No", null)
+	    .show();
+		
 		// TODO new view to report result
 	}
 
