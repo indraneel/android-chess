@@ -265,9 +265,9 @@ public class PlayChess extends Activity {
         		 
         		 // Grabbing the width
         		 
-        		 im.setMinimumHeight(displayHeight/10);
+        		 im.setMinimumHeight(displayHeight/8);
         		 im.setMinimumWidth(20);
-        		 im.setMaxHeight(displayHeight / 10);
+        		 im.setMaxHeight(displayHeight / 8);
         		 im.setMaxWidth(20);
             	 if (squares[r][c].isWhite()){
             		 im.setBackgroundColor(Color.WHITE);
