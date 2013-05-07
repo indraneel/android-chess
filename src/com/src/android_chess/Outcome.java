@@ -1,17 +1,12 @@
 package com.src.android_chess;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 public class Outcome extends Activity {
 
@@ -30,8 +25,6 @@ public class Outcome extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
 		quit.setText("Quit");
@@ -39,8 +32,8 @@ public class Outcome extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
+				Intent intent = new Intent(getBaseContext(), Start.class);
+				startActivity(intent);
 			}
 		});
 		

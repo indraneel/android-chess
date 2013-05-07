@@ -14,4 +14,6 @@
     <string name="title_activity_select_game">SelectGame</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="title_activity_select_replay">SelectReplay</string>
+
 </resources>
